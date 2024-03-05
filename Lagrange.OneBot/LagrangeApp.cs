@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 using Lagrange.Core;
 using Lagrange.Core.Common.Interface.Api;
@@ -51,11 +50,7 @@ public class LagrangeApp : IHost
     {
         await _hostApp.StartAsync(cancellationToken);
         Logger.LogInformation("Lagrange.OneBot Implementation has started");
-        Logger.LogInformation($"Protocol: {Configuration["Protocol"]} | {Instance.ContextCollection.AppInfo.CurrentVersion}");
-
-        Instance.ContextCollection.Packet.SignProvider = Services.GetRequiredService<SignProvider>();
-        if (!string.IsNullOrEmpty(Configuration["Account:Password"]))
-            Instance.ContextCollection.Keystore.PasswordMd5 = await Encoding.UTF8.GetBytes(Configuration["Account:Password"] ?? "").Md5Async();
+        Logger.LogInformation($"Protocol: {Configuration["Protocol"]} | {Instance.ContextCollection.AppInfo.BaseVersion}");
 
         Instance.Invoker.OnBotLogEvent += (_, args) => Services.GetRequiredService<ILogger<BotContext>>().Log(args.Level switch
         {
@@ -108,6 +103,20 @@ public class LagrangeApp : IHost
                     var randomString = Console.ReadLine();
 
                     if (ticket != null && randomString != null) Instance.SubmitCaptcha(ticket, randomString);
+                }, cancellationToken);
+            };
+
+            Instance.Invoker.OnBotNewDeviceVerify += async (_, args) =>
+            {
+                Logger.LogWarning($"Phone number: {args.PhoneNumber}");
+                Logger.LogWarning("Please input sms code:");
+
+                await Task.Run(() =>
+                {
+                    Instance.SendSmsCode();
+                    var smsCode = Console.ReadLine();
+
+                    if (smsCode != null) Instance.SubmitSmsCode(smsCode);
                 }, cancellationToken);
             };
 

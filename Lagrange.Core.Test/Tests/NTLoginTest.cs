@@ -1,8 +1,4 @@
-using Lagrange.Core.Common;
-using Lagrange.Core.Common.Interface;
 using Lagrange.Core.Common.Interface.Api;
-using Lagrange.Core.Internal.Event.System;
-using Lagrange.Core.Message;
 
 namespace Lagrange.Core.Test.Tests;
 
@@ -10,37 +6,8 @@ namespace Lagrange.Core.Test.Tests;
 
 public class NTLoginTest
 {
-    public async Task LoginByPassword()
+    public async Task LoginByPassword(BotContext bot)
     {
-        var deviceInfo = WtLoginTest.GetDeviceInfo();
-        var keyStore = WtLoginTest.LoadKeystore();
-        
-        if (keyStore == null)
-        {
-            Console.WriteLine("Please login by QrCode first");
-            return;
-        }
-
-        var bot = BotFactory.Create(new BotConfig() 
-        {
-            UseIPv6Network = false,
-            GetOptimumServer = true,
-            AutoReconnect = true,
-            Protocol = Protocols.Linux
-        }, deviceInfo, keyStore);
-        
-        bot.Invoker.OnBotLogEvent += (_, @event) =>
-        {
-            Utility.Console.ChangeColorByTitle(@event.Level);
-            Console.WriteLine(@event.ToString());
-        };
-        
-        bot.Invoker.OnBotOnlineEvent += (_, @event) =>
-        {
-            Console.WriteLine(@event.ToString());
-            WtLoginTest.SaveKeystore(bot.UpdateKeystore());
-        };
-        
         bot.Invoker.OnBotCaptchaEvent += (_, @event) =>
         {
             Console.WriteLine(@event.ToString());
