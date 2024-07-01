@@ -4,33 +4,39 @@ namespace Lagrange.Core.Internal.Packets;
 
 internal class SsoPacket : IDisposable
 {
-    public byte PacketType { get; set; }
-    
+    public uint PacketType { get; }
+
+    public byte EncodeType { get; }
+
     public string Command { get; }
-    
-    public uint Sequence { get; }
-    
+
+    public byte[] MsgCookie { get; }
+
+    public int Sequence { get; }
+
     public BinaryPacket Payload { get; }
-    
+
     public int RetCode { get; }
-    
+
     public string? Extra { get; }
-    
-    public SsoPacket(byte packetType, string command, uint sequence, BinaryPacket payload)
+
+    public SsoPacket(uint packetType, byte encodeType, string command, byte[] msgCookie, int sequence, BinaryPacket payload)
     {
         PacketType = packetType;
+        EncodeType = encodeType;
         Command = command;
+        MsgCookie = msgCookie;
         Sequence = sequence;
         Payload = payload;
     }
 
-    public SsoPacket(byte packetType, string command, uint sequence, int retCode, string extra)
+    public SsoPacket(string command, byte[] msgCookie, int sequence, BinaryPacket payload, int retCode, string extra)
     {
-        PacketType = packetType;
         Command = command;
+        MsgCookie = msgCookie;
         Sequence = sequence;
+        Payload = payload;
         RetCode = retCode;
-        Payload = new BinaryPacket();
         Extra = extra;
     }
 

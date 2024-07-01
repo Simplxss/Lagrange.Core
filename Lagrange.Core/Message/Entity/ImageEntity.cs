@@ -1,11 +1,8 @@
 using System.Numerics;
-using Lagrange.Core.Internal.Packets.Message.Component.Extra;
 using Lagrange.Core.Internal.Packets.Message.Element;
 using Lagrange.Core.Internal.Packets.Message.Element.Implementation;
-using Lagrange.Core.Internal.Packets.Message.Element.Implementation.Extra;
 using Lagrange.Core.Internal.Packets.Service.Oidb.Common;
 using Lagrange.Core.Utility.Extension;
-using ProtoBuf;
 
 namespace Lagrange.Core.Message.Entity;
 
@@ -38,7 +35,7 @@ public class ImageEntity : IMessageEntity
     internal CustomFace? CompatFace { get; set; }
 
     internal string? Summary { get; set; }
-    
+
     internal int SubType { get; set; }
 
     public ImageEntity() { }
@@ -54,7 +51,7 @@ public class ImageEntity : IMessageEntity
         FilePath = "";
         ImageStream = new Lazy<Stream>(() => new MemoryStream(file));
     }
-    
+
     public ImageEntity(Stream stream)
     {
         FilePath = "";
@@ -143,7 +140,7 @@ public class ImageEntity : IMessageEntity
 
         return null;
     }
-    
+
     private static int GetImageTypeFromFaceOldData(CustomFace face)
     {
         if (face.OldData.Length < 5)

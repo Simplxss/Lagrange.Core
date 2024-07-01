@@ -16,7 +16,7 @@ internal class SsoAliveService : BaseService<SsoAliveEvent>
         out BinaryPacket output, out List<BinaryPacket>? extraPackets)
     {
         using var stream = new MemoryStream();
-        var packet = new NTSsoHeartBeat { Type = 1 };
+        var packet = new SsoHeartBeatRequest { Type = 1 };
         
         output = packet.Serialize();
         extraPackets = null;

@@ -1,16 +1,14 @@
+using Lagrange.Core.Common;
+
 namespace Lagrange.Core.Utility.Sign;
 
 public abstract class SignProvider
 {
-    protected bool Available = true;
-    
     protected static readonly string[] WhiteListCommand =
     {
-        "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey",
-        "trpc.o3.ecdh_access.EcdhAccess.SsoSecureAccess",
-        "trpc.o3.report.Report.SsoReport",
         "MessageSvc.PbSendMsg",
         "wtlogin.trans_emp",
+        "wtlogin.exchange_emp",
         "wtlogin.login",
         "trpc.login.ecdh.EcdhService.SsoKeyExchange",
         "trpc.login.ecdh.EcdhService.SsoNTLoginPasswordLogin",
@@ -44,8 +42,10 @@ public abstract class SignProvider
         "OidbSvcTrpcTcp.0xf67_1",
         "OidbSvcTrpcTcp.0xf67_5"
     };
-    
-    public abstract byte[]? Sign(string cmd, uint seq, byte[] body, out byte[]? ver, out string? token);
 
-    public abstract bool Test();
+    public abstract byte[] Sign(BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body);
+
+    public virtual byte[] Energy(string salt, string data) => throw new NotImplementedException();
+
+    public virtual byte[] GetXwDebugId(uint uin, string cmd, string subCmd) => throw new NotImplementedException();
 }

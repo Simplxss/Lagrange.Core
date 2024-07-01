@@ -11,5 +11,7 @@ public class OneBotSendPacket
     
     [JsonPropertyName("sign")] public bool Sign { get; set; }
 
-    [JsonPropertyName("type")] public byte Type { get; set; } = 12;
+    [JsonPropertyName("packet_type")] public byte PacketType { get; set; } = 12;
+
+    [JsonPropertyName("encode_type")] public byte EncodeType { get; set; } = 1;
 }

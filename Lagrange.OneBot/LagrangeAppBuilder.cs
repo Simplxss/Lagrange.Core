@@ -18,16 +18,16 @@ namespace Lagrange.OneBot;
 public sealed class LagrangeAppBuilder
 {
     private IServiceCollection Services => _hostAppBuilder.Services;
-    
+
     private ConfigurationManager Configuration => _hostAppBuilder.Configuration;
-    
+
     private readonly HostApplicationBuilder _hostAppBuilder;
 
     internal LagrangeAppBuilder(string[] args)
     {
         _hostAppBuilder = new HostApplicationBuilder(args);
     }
-    
+
     public LagrangeAppBuilder ConfigureConfiguration(string path, bool optional = false, bool reloadOnChange = false)
     {
         Configuration.AddJsonFile(path, optional, reloadOnChange);
@@ -39,7 +39,7 @@ public sealed class LagrangeAppBuilder
     {
         string keystorePath = Configuration["ConfigPath:Keystore"] ?? "keystore.json";
         string deviceInfoPath = Configuration["ConfigPath:DeviceInfo"] ?? "device.json";
-        
+
         bool isSuccess = Enum.TryParse<Protocols>(Configuration["Account:Protocol"], out var protocol);
         var config = new BotConfig
         {
@@ -48,13 +48,19 @@ public sealed class LagrangeAppBuilder
             UseIPv6Network = bool.Parse(Configuration["Account:UseIPv6Network"] ?? "false"),
             GetOptimumServer = bool.Parse(Configuration["Account:GetOptimumServer"] ?? "true"),
             AutoReLogin = bool.Parse(Configuration["Account:AutoReLogin"] ?? "true"),
+            CustomSignProvider = protocol switch
+            {
+                Protocols.AndroidPhone or Protocols.AndroidPad => new OnebotAndroidSigner(Configuration),
+                Protocols.Linux => new OnebotLinuxSigner(Configuration),
+                _ => null
+            }
         };
 
         BotKeystore keystore;
         if (!File.Exists(keystorePath))
         {
-            keystore = Configuration["Account:Uin"] is { } uin && Configuration["Account:Password"] is { } password 
-                    ? new BotKeystore(uint.Parse(uin), password) 
+            keystore = Configuration["Account:Uin"] is { } uin && Configuration["Account:Password"] is { } password
+                    ? new BotKeystore(uint.Parse(uin), password)
                     : new BotKeystore();
             string? directoryPath = Path.GetDirectoryName(keystorePath);
             if (!string.IsNullOrEmpty(directoryPath))
@@ -70,7 +76,7 @@ public sealed class LagrangeAppBuilder
         BotDeviceInfo deviceInfo;
         if (!File.Exists(deviceInfoPath))
         {
-            deviceInfo = BotDeviceInfo.GenerateInfo();
+            deviceInfo = BotDeviceInfo.GenerateInfo(config.Protocol);
             string json = JsonSerializer.Serialize(deviceInfo);
             string? directoryPath = Path.GetDirectoryName(deviceInfoPath);
             if (!string.IsNullOrEmpty(directoryPath))
@@ -81,14 +87,14 @@ public sealed class LagrangeAppBuilder
         }
         else
         {
-            deviceInfo = JsonSerializer.Deserialize<BotDeviceInfo>(File.ReadAllText(deviceInfoPath)) ?? BotDeviceInfo.GenerateInfo();
+            deviceInfo = JsonSerializer.Deserialize<BotDeviceInfo>(File.ReadAllText(deviceInfoPath)) ?? BotDeviceInfo.GenerateInfo(config.Protocol);
         }
 
         Services.AddSingleton(BotFactory.Create(config, deviceInfo, keystore));
-        
+
         return this;
     }
-    
+
     public LagrangeAppBuilder ConfigureOneBot()
     {
         Services.AddSingleton<LagrangeWebSvcCollection>();
@@ -116,8 +122,6 @@ public sealed class LagrangeAppBuilder
             db.CheckpointSize = 50;
             return db;
         });
-        Services.AddSingleton<SignProvider, OneBotSigner>();
-
         Services.AddSingleton<MusicSigner>();
         Services.AddSingleton<NotifyService>();
         Services.AddSingleton<MessageService>();

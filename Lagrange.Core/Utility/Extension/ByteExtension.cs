@@ -72,6 +72,13 @@ internal static class ByteExtension
         return hash.Hex(lower);
     }
 
+    public static string Sha256(this byte[] bytes, bool lower = false)
+    {
+        using var sha256 = SHA256.Create();
+        var hash = sha256.ComputeHash(bytes);
+        return hash.Hex(lower);
+    }
+
     // By Executor-Cheng https://github.com/KonataDev/Lagrange.Core/pull/344#pullrequestreview-2027515322
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static uint ToCharsBuffer(byte value, uint casing = 0)

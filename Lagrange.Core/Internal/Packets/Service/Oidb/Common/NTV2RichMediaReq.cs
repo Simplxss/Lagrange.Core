@@ -105,6 +105,8 @@ internal class IndexNode
     [ProtoMember(5)] public uint Ttl { get; set; } // 0
 
     [ProtoMember(6)] public uint SubType { get; set; } // 0
+
+    [ProtoMember(7)] public uint StoreAppId { get; set; } // 0
 }
 
 [ProtoContract]

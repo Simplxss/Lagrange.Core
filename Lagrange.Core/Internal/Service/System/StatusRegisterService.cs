@@ -9,30 +9,70 @@ using ProtoBuf;
 namespace Lagrange.Core.Internal.Service.System;
 
 [EventSubscribe(typeof(StatusRegisterEvent))]
-[Service("trpc.qq_new_tech.status_svc.StatusService.Register")]
+[Service("trpc.msg.register_proxy.RegisterProxy.SsoInfoSync")]
 internal class StatusRegisterService : BaseService<StatusRegisterEvent>
 {
     protected override bool Build(StatusRegisterEvent input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
         out BinaryPacket output, out List<BinaryPacket>? extraPackets)
     {
-        var packet = new ServiceRegister
+        var packet = new SsoInfoSyncRequest
         {
-            Guid = device.Guid.ToByteArray().Hex(true),
-            KickPC = 0,
-            CurrentVersion = appInfo.CurrentVersion,
-            IsFirstRegisterProxyOnline = 0,
-            LocaleId = 2052,
-            Device = new OnlineDeviceInfo
+            SyncFlag = 735,
+            ReqRandom = (uint)Random.Shared.Next(),
+            CurActiveStatus = 2,
+            GroupLastMsgTime = 0,
+            C2CInfoSync = new SsoC2CInfoSync
             {
-                User = device.DeviceName,
-                Os = appInfo.Kernel,
-                OsVer = device.SystemKernel,
-                VendorName = "",
-                OsLower = appInfo.VendorOs,
+                C2CMsgCookie = new SsoC2CMsgCookie
+                {
+                    C2CLastMsgTime = 0
+                },
+                C2CLastMsgTime = 0,
+                LastC2CMsgCookie = new SsoC2CMsgCookie
+                {
+                    C2CLastMsgTime = 0
+                }
             },
-            SetMute = 0,
-            RegisterVendorType = 0,
-            RegType = 1,
+            NormalConfig = new NormalConfig
+            {
+                IntCfg = new Dictionary<uint, int> { { 46, 0 }, { 283, 0 } }
+            },
+            RegisterInfo = new RegisterInfo
+            {
+                Guid = device.System.Guid.ToByteArray().Hex(true),
+                KickPC = 0,
+                CurrentVersion = appInfo.CurrentVersion,
+                IsFirstRegisterProxyOnline = 1,
+                LocaleId = 2052,
+                DeviceInfo = new OnlineDeviceInfo
+                {
+                    DevName = device.Model.DeviceName,
+                    DevType = appInfo.Kernel,
+                    OsVer = device.System.OsType,
+                    Brand = "",
+                    VendorOsName = appInfo.VendorOs,
+                },
+                SetMute = 0,
+                RegisterVendorType = 6,
+                RegType = 0,
+                BusinessInfo = new OnlineBusinessInfo
+                {
+                    NotifySwitch = 1,
+                    BindUinNotifySwitch = 1
+                },
+                BatteryStatus = 100
+            },
+            UnknownStructure = new UnknownStructure
+            {
+                GroupCode = 0,
+                Flag2 = 2
+            },
+            AppState = new CurAppState
+            {
+                IsDelayRequest = 0,
+                AppStatus = 1,
+                SilenceStatus = 1
+            }
         };
 
         output = packet.Serialize();
@@ -43,9 +83,9 @@ internal class StatusRegisterService : BaseService<StatusRegisterEvent>
     protected override bool Parse(Span<byte> input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
         out StatusRegisterEvent output, out List<ProtocolEvent>? extraEvents)
     {
-        var response = Serializer.Deserialize<ServiceRegisterResponse>(input);
+        var response = Serializer.Deserialize<SsoInfoSyncResponse>(input);
 
-        output = StatusRegisterEvent.Result(response.Message ?? "OK");
+        output = StatusRegisterEvent.Result(response?.RegisterInfoResponse?.Message ?? "IDK");
         extraEvents = null;
         return true;
     }
