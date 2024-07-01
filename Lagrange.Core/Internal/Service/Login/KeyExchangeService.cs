@@ -15,7 +15,13 @@ namespace Lagrange.Core.Internal.Service.Login;
 [Service("trpc.login.ecdh.EcdhService.SsoKeyExchange", 12, 2)]
 internal class KeyExchangeService : BaseService<KeyExchangeEvent>
 {
-    private const string GcmCalc2Key = "e2733bf403149913cbf80c7a95168bd4ca6935ee53cd39764beebe2e007e3aee";
+    private static readonly byte[] GcmCalc2Key = new byte[]
+    {
+        0xE2, 0x73, 0x3B, 0xF4, 0x03, 0x14, 0x99, 0x13,
+        0xCB, 0xF8, 0x0C, 0x7A, 0x95, 0x16, 0x8B, 0xD4,
+        0xCA, 0x69, 0x35, 0xEE, 0x53, 0xCD, 0x39, 0x76,
+        0x4B, 0xEE, 0xBE, 0x2E, 0x00, 0x7E, 0x3A, 0xEE
+    };
 
     private static readonly byte[] PubKey = new byte[] // From NTQQ Binary, by hook
     {
@@ -58,7 +64,7 @@ internal class KeyExchangeService : BaseService<KeyExchangeEvent>
         var stream2 = BinarySerializer.Serialize(plain2);
         using var sha256 = SHA256.Create();
         var hash = sha256.ComputeHash(stream2.ToArray());
-        var gcmCalc2 = AesGcmImpl.Encrypt(hash, GcmCalc2Key.UnHex());
+        var gcmCalc2 = AesGcmImpl.Encrypt(hash, GcmCalc2Key);
 
         var packet = new SsoKeyExchange
         {
@@ -74,7 +80,7 @@ internal class KeyExchangeService : BaseService<KeyExchangeEvent>
         return true;
     }
 
-    protected override bool Parse(Span<byte> input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device, 
+    protected override bool Parse(Span<byte> input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
         out KeyExchangeEvent output, out List<ProtocolEvent>? extraEvents)
     {
         var response = Serializer.Deserialize<SsoKeyExchangeResponse>(input);
@@ -86,7 +92,7 @@ internal class KeyExchangeService : BaseService<KeyExchangeEvent>
         keystore.Session.ExchangeKey = decrypted.GcmKey;
         keystore.Session.KeySign = decrypted.Sign;
         output = KeyExchangeEvent.Result();
-        
+
         extraEvents = null;
         return true;
     }

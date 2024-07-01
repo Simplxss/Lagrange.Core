@@ -2,32 +2,18 @@ namespace Lagrange.Core.Internal.Event.Login;
 
 internal class LoginCommon
 {
+    // 140022017: å®‰å…¨æé†’: ç™»å½•å¤±è´¥ï¼Œè¯·å‰å¾€QQå®˜ç½‘im.qq.comä¸‹è½½æœ€æ–°ç‰ˆQQåé‡è¯•ï¼Œæˆ–é€šè¿‡é—®é¢˜åé¦ˆä¸æˆ‘ä»¬è”ç³»ã€‚
     public enum Error : uint
     {
-        TokenExpired = 140022015,
-        UnusualVerify = 140022011,
-        NewDeviceVerify = 140022010,
+        preLoginDeviceVerify = 140022007,
         CaptchaVerify = 140022008,
+        NewDeviceVerify = 140022010,
+        UnusualVerify = 140022011,
+        TokenExpired = 140022015,
         Success = 0,
         Unknown = 1,
     }
 
-    /*
-     * 0 µÇÂ¼³É¹¦
-     * 1 ÃÜÂë´íÎó
-     * 2 ÑéÖ¤Âë
-     * 32 ±»»ØÊÕ
-     * 40 ±»¶³½á
-     * 160 Éè±¸Ëø
-     * 162 ¶ÌĞÅ·¢ËÍÊ§°Ü
-     * 163 ¶ÌĞÅÑéÖ¤Âë´íÎó
-     * 180 »Ø¹ö (ecdh´íÎó, ...)
-     * 204 Éè±¸Ëø ÑéÖ¤
-     * 235 °æ±¾¹ıµÍ
-     * 237 ÉÏÍø»·¾³Òì³£
-     * 239 Éè±¸Ëø
-     * 243 ·Ç·¨À´Ô´½ûÖ¹µÇÂ¼
-     */
     public enum State : uint
     {
         Success = 0,

@@ -15,7 +15,7 @@ internal class SsoNTLoginResponse
     
     [ProtoMember(2)] public SsoNTLoginCaptchaUrl? Captcha { get; set; }
     
-    [ProtoMember(3)] public SsoNTLoginUnusual? Unusual { get; set; }
+    // [ProtoMember(3)] public SsoNTLoginUnusual? Unusual { get; set; }
     
-    [ProtoMember(4)] public SsoNTLoginUid? Uid { get; set; }
+    [ProtoMember(3)] public SsoNTLoginUid? Uid { get; set; }
 }

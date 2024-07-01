@@ -49,12 +49,11 @@ internal class PasswordLoginService : BaseService<PasswordLoginEvent>
             var response = Serializer.Deserialize<SsoNTLoginBase<SsoNTLoginResponse>>(decrypted.AsSpan());
             var body = response.Body;
             
-            if (response.Header?.Error != null || body?.Credentials == null)
+            if (response.Header?.Error != null || body is not { Credentials: not null, Uid: not null })
             {
-                keystore.Session.UnusualSign = body?.Unusual?.Sig;
                 keystore.Session.UnusualCookies = response.Header?.Cookie?.Cookie;
-                keystore.Session.CaptchaUrl = body?.Captcha?.Url;
                 keystore.Session.NewDeviceVerifyUrl = response.Header?.Error?.NewDeviceVerifyUrl;
+                keystore.Session.CaptchaUrl = body?.Captcha?.Url;
                 
                 string? tag = response.Header?.Error?.Tag;
                 string? message = response.Header?.Error?.Message;
@@ -62,6 +61,7 @@ internal class PasswordLoginService : BaseService<PasswordLoginEvent>
             }
             else
             {
+                keystore.Uid = body.Uid.Uid;
                 keystore.Session.Tgt = body.Credentials.Tgt;
                 keystore.Session.D2 = body.Credentials.D2;
                 keystore.Session.D2Key = body.Credentials.D2Key;

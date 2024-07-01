@@ -128,7 +128,7 @@ public class BotDeviceInfo
             Protocols.Windows => new()
             {
                 OsType = "Windows 10.0.19042",
-                OsVersion = "10.0.19042.0",
+                OsVersion = "10.0.26244",
                 Guid = Guid.NewGuid()
             },
             Protocols.AndroidPhone or Protocols.AndroidPad => new()

@@ -137,7 +137,7 @@ public class BotAppInfo
             SubSigBitmap = 0
         },
 
-        NTLoginType = 5,
+        NTLoginType = 4,
         SignProvider = new WindowsSigner()
     };
 

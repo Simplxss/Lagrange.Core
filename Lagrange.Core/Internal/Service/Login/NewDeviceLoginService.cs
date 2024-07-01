@@ -18,6 +18,7 @@ internal class NewDeviceLoginService : BaseService<NewDeviceLoginEvent>
         out BinaryPacket output, out List<BinaryPacket>? extraPackets)
     {
         if (keystore.Session.A2 == null) throw new InvalidOperationException("A2 is null");
+        // Field #1  { "type": "down-sms", "sig": "i4rWSeOd2D2il7KiIElXGGO%2BGGlWoTY3kqHqITXtJcNuWVKjLH8dwnqMCyhnYVDs" }
 
         output = SsoNTLoginCommon.BuildNTLoginPacket(keystore, appInfo, device, keystore.Session.A2);
         extraPackets = null;
@@ -37,12 +38,13 @@ internal class NewDeviceLoginService : BaseService<NewDeviceLoginEvent>
             var response = Serializer.Deserialize<SsoNTLoginBase<SsoNTLoginResponse>>(decrypted.AsSpan());
             var body = response.Body;
 
-            if (response.Header?.Error != null || body is not { Credentials: not null })
+            if (response.Header?.Error != null || body is not { Credentials: not null, Uid: not null})
             {
                 output = NewDeviceLoginEvent.Result((int)(response.Header?.Error?.ErrorCode ?? 1));
             }
             else
             {
+                keystore.Uid = body.Uid.Uid;
                 keystore.Session.Tgt = body.Credentials.Tgt;
                 keystore.Session.D2 = body.Credentials.D2;
                 keystore.Session.D2Key = body.Credentials.D2Key;
