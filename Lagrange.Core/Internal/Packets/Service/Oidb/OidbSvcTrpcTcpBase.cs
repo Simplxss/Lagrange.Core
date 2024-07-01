@@ -64,7 +64,7 @@ internal class OidbSvcTrpcTcpBase<T> where T : class
         Properties = new List<OidbProperty>();
     }
     
-    public OidbSvcTrpcTcpBase(T body, uint command,uint subCommand, bool isLafter = false, bool isUid = false)
+    public OidbSvcTrpcTcpBase(T body, uint command, uint subCommand, bool isLafter = false, bool isUid = false)
     {
         Command = command;
         SubCommand = subCommand;
