@@ -25,7 +25,7 @@ internal class Tlv106 : TlvBody
         Uin = keystore.Uin;
         Time = (uint)DateTimeOffset.Now.ToUnixTimeSeconds();
         PasswordMd5 = keystore.PasswordMd5!;
-        TgtgtKey = keystore.Stub.TgtgtKey;
+        Tgtgt = keystore.Stub.Tgtgt;
         Guid = device.System.Guid.ToByteArray();
         SubAppId = appInfo.SubAppId;
         UinStr = keystore.Uin.ToString();
@@ -41,7 +41,7 @@ internal class Tlv106 : TlvBody
     [BinaryProperty] public uint IP { get; set; } = 0;
     [BinaryProperty] public byte u2 { get; set; } = 1;
     [BinaryProperty] public byte[] PasswordMd5 { get; set; }
-    [BinaryProperty] public byte[] TgtgtKey { get; set; }
+    [BinaryProperty] public byte[] Tgtgt { get; set; }
     [BinaryProperty] public uint u3 { get; set; } = 0;
     [BinaryProperty] public byte u4 { get; set; } = 1;
     [BinaryProperty] public byte[] Guid { get; set; }

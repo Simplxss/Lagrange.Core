@@ -175,10 +175,8 @@ internal class BusinessContext : ContextBase
     /// <summary>
     /// Handle the incoming packet with new sequence number.
     /// </summary>
-    public async Task<bool> HandleServerPacket(SsoPacket packet)
+    public async Task HandleServerPacket(SsoPacket packet)
     {
-        bool success = false;
-
         try
         {
             var events = Collection.Service.ResolveEventByPacket(packet);
@@ -186,8 +184,6 @@ internal class BusinessContext : ContextBase
             {
                 var isSuccessful = await Collection.Business.HandleIncomingEvent(@event);
                 if (!isSuccessful) break;
-
-                success = true;
             }
         }
         catch (Exception e)
@@ -197,7 +193,5 @@ internal class BusinessContext : ContextBase
             if (e.StackTrace is { } stackTrace) Collection.Log.LogWarning(Tag, stackTrace);
             Collection.Log.LogDebug(Tag, packet.Payload.ToArray().Hex());
         }
-
-        return success;
     }
 }

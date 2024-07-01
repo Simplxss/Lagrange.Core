@@ -8,15 +8,9 @@ namespace Lagrange.Core.Internal.Packets.Tlv;
 
 [Tlv(0x16A)]
 internal class Tlv16A : TlvBody
-{
-    /// <summary>
-    /// Tlv0x16A <see cref="Tlv019"/>
-    /// </summary>
-    public Tlv16A(BotKeystore keystore)
-    {
-        NoPicSig = keystore.Session.NoPicSig ?? Array.Empty<byte>();
-    }
-    
+{   
+    public Tlv16A(BotKeystore keystore) => NoPicSig = keystore.Session.NoPicSig ?? Array.Empty<byte>();
+
     [BinaryProperty(Prefix.None)] public byte[] NoPicSig { get; set; }
 }
 

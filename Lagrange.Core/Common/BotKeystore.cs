@@ -57,16 +57,16 @@ public class BotKeystore
 
     public class KeyCollection
     {
-        public byte[] RandomKey { get; set; } = ByteGen.GenRandomBytes(16);
-        public byte[] TgtgtKey { get; set; } = ByteGen.GenRandomBytes(16);
+        public byte[]? RandomKey { get; set; }
+        public byte[] Tgtgt { get; set; } = ByteGen.GenRandomBytes(16); // from tlv01E, size: 16
     }
 
     public class WtLoginSession
     {
         public DateTime SessionDate { get; set; }
-        public byte[]? NoPicSig { get; set; } // size: 80, may be from Tlv019, for Tlv16A
+        public byte[]? NoPicSig { get; set; } // android: from tlv16A, size: 80; windows from tlv019, size: 176 size: 88
         public byte[] StWebSig { get; set; } = Array.Empty<byte>(); // from tlv103, size: 64
-        public byte[]? A2 { get; set; } // from tlv106, size: 160?
+        public byte[]? A2 { get; set; } // android: from tlv106, size: 160; windows from tlv018, size: 176
         public byte[] Tgt { get; set; } = Array.Empty<byte>(); // from tlv10A, size: 72
         public byte[] Tgtgt { get; set; } = Array.Empty<byte>(); // from tlv10C, size: 16
         public byte[] TgtKey { get; set; } = Array.Empty<byte>(); // from tlv10D, size: 16

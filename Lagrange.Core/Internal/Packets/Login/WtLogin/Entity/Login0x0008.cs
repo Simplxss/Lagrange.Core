@@ -12,7 +12,7 @@ internal class Login0x0008 : Login
     public Login0x0008(BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device)
         : base(LoginCommand, keystore, appInfo, device) { }
 
-    protected override BinaryPacket ConstructLogin() => new BinaryPacket()
+    protected override BinaryPacket ConstructTlv() => new BinaryPacket()
         .WriteShort(0x0008)
         .WritePacket(new TlvPacket(0x008, new Tlv008()))
         .WritePacket(new TlvPacket(0x104, new Tlv104(Keystore)))

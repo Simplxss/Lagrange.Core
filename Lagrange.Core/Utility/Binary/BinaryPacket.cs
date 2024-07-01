@@ -91,8 +91,9 @@ internal unsafe partial class BinaryPacket : IDisposable  // TODO: Reimplement i
         return this;
     }
 
-    public BinaryPacket WritePacket(BinaryPacket value)
+    public BinaryPacket WritePacket(BinaryPacket value, Prefix prefix = Prefix.None, int addition = 0)
     {
+        WriteLength((int)value.Length, prefix, addition);
         value._stream.Seek(0, SeekOrigin.Begin);
         value._stream.CopyTo(_stream);
         return this;

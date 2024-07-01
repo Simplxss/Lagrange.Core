@@ -100,28 +100,8 @@ internal partial class ServiceContext : ContextBase
             Collection.Log.LogDebug(Tag, $"Unsuccessful SSOFrame Payload: {payload.Hex()}");
             if (packet.RetCode == -10001)
                 if (Collection.AppInfo.Os == "Android")
-                {
-                    Collection.Log.LogInfo(Tag, "Trying to do Exchange...");
+                    Collection.Business.WtExchangeLogic.ReLogin().GetAwaiter().GetResult();
 
-                    var exchangeEmpEvent = ExchangeEmpEvent.Create(ExchangeEmpEvent.State.RefreshD2);
-                    var exchangeEmpResult = Collection.Business.SendEvent(exchangeEmpEvent).GetAwaiter().GetResult();
-
-                    if (exchangeEmpResult.Count != 0)
-                    {
-                        var @tmp = (ExchangeEmpEvent)exchangeEmpResult[0];
-                        if ((ExchangeEmp.State)@tmp.ResultCode != ExchangeEmp.State.Success)
-                        {
-                            Collection.Log.LogWarning(Tag, @tmp is { Message: not null, Tag: not null }
-                                ? $"Login Failed: {(ExchangeEmp.State)@tmp.ResultCode} ({@tmp.ResultCode}) | {@tmp.Tag}: {@tmp.Message}"
-                                : $"Login Failed: {(ExchangeEmp.State)@tmp.ResultCode} ({@tmp.ResultCode})");
-                            return result;
-                        }
-
-                        Collection.Log.LogInfo(Tag, "Exchange Success");
-                        Collection.Business.WtExchangeLogic.BotOnline().GetAwaiter().GetResult();
-                        return result;
-                    }
-                }
             return result;
         }
 

@@ -51,8 +51,7 @@ public sealed class LagrangeAppBuilder
             CustomSignProvider = protocol switch
             {
                 Protocols.AndroidPhone or Protocols.AndroidPad => new OnebotAndroidSigner(Configuration),
-                Protocols.Linux => new OnebotLinuxSigner(Configuration),
-                _ => null
+                _ => new OnebotSigner(Configuration)
             }
         };
 

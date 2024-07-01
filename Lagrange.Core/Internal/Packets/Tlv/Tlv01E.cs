@@ -8,5 +8,5 @@ namespace Lagrange.Core.Internal.Packets.Tlv;
 [Tlv(0x01e)]
 internal class Tlv01E : TlvBody
 {
-    [BinaryProperty(Prefix.None)] public byte[] TgtgtKey { get; set; } // a1_sig
+    [BinaryProperty(Prefix.None)] public byte[] Tgtgt { get; set; } // a1_sig
 }

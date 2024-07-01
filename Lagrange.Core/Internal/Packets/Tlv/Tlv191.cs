@@ -9,5 +9,5 @@ internal class Tlv191 : TlvBody
 {
     public Tlv191(byte codeType) => CodeType = codeType;
 
-    [BinaryProperty] public byte CodeType { get; set; } // CodeType 验证码类型 0x01:字母 0x82:滑块
+    [BinaryProperty] public byte CodeType { get; set; } // CodeType: picture: 0x01, slider captcha: 0x82
 }

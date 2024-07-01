@@ -15,7 +15,7 @@ internal class DataHighwayHead
     
     [ProtoMember(5)] public uint RetryTimes { get; set; }
     
-    [ProtoMember(6)] public uint AppId { get; set; }
+    [ProtoMember(6)] public uint SubAppId { get; set; }
     
     [ProtoMember(7)] public uint DataFlag { get; set; }
     

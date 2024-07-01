@@ -59,16 +59,19 @@ internal class OnebotAndroidSigner : SignProvider
                     { "cmd", cmd },
                     { "seq", seq },
                     { "buffer", body.Hex() },
+                    { "src", body.Hex() },
                     { "android_id", device.System.AndroidId },
-                    { "guid", device.System.Guid.ToByteArray().Hex() }
+                    { "guid", device.System.Guid.ToByteArray().Hex() },
+                    { "qimei36", keystore.Session.QImei?.Q36 ?? "" },
                 };
                 var message = _client.PostAsJsonAsync(SignUrl, payload).Result;
                 string response = message.Content.ReadAsStringAsync().Result;
                 var json = JsonSerializer.Deserialize<JsonObject>(response);
 
-                var secSig = json?["data"]?["sign"]?.ToString().UnHex();
-                var secDeviceToken = json?["data"]?["token"]?.ToString().UnHex();
-                var secExtra = json?["data"]?["extra"]?.ToString().UnHex();
+                var data = json?["data"] ?? json?["value"];
+                var secSig = data?["sign"]?.ToString().UnHex();
+                var secDeviceToken = data?["token"]?.ToString().UnHex();
+                var secExtra = data?["extra"]?.ToString().UnHex();
 
                 signature.SecInfo = new SsoSecureInfo
                 {

@@ -10,5 +10,5 @@ internal class NTOS
 {
     [ProtoMember(1)] public string OS { get; set; }
     
-    [ProtoMember(2)] public string Name { get; set; }
+    [ProtoMember(2)] public string UserName { get; set; }
 }

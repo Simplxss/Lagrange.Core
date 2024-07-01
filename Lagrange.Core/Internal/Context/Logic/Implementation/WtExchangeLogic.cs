@@ -565,7 +565,7 @@ internal class WtExchangeLogic : LogicBase
         return result.Count != 0 && ((UnusualEasyLoginEvent)result[0]).Success;
     }
 
-    private async Task<bool> ReLogin()
+    public async Task<bool> ReLogin()
     {
         Collection.Log.LogInfo(Tag, "Session is about to expire, try to relogin and refresh");
         if (Collection.Keystore.Session.A2 == null)

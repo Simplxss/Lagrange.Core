@@ -17,7 +17,7 @@ internal class Tlv521 : TlvBody
         }
         else
         {
-            ProductType = 0x13;
+            ProductType = 0x17;
             ProductDesc = "basicim";
         }
     }

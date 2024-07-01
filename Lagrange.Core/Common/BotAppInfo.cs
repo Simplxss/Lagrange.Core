@@ -45,8 +45,6 @@ public class BotAppInfo
     /// <summary>Or known as pubId in tencent log</summary>
     public uint SubAppId { get; private set; }
 
-    public uint AppIdQrCode { get; private set; }
-
     public ushort AppClientVersion { get; private set; }
 
     public ushort NTLoginType { get; private set; }
@@ -73,7 +71,6 @@ public class BotAppInfo
         PackageSign = "V1_LNX_NQ_3.1.2-13107_RDM_B",
         AppId = 1600001615,
         SubAppId = 537146866,
-        AppIdQrCode = 13697054,
         AppClientVersion = 13172,
         WtLoginSdk = new()
         {
@@ -102,7 +99,6 @@ public class BotAppInfo
         PackageSign = "V1_MAC_NQ_6.9.23-20139_RDM_B",
         AppId = 1600001602,
         SubAppId = 537200848,
-        AppIdQrCode = 537200848,
         AppClientVersion = 13172,
         WtLoginSdk = new()
         {
@@ -123,23 +119,21 @@ public class BotAppInfo
         Kernel = "Windows_NT",
         VendorOs = "win32",
 
-        BaseVersion = "9.9.1-15489",
-        CurrentVersion = "",
+        BaseVersion = "9.9.12-25300",
+        CurrentVersion = "9.9.12-25300",
         BuildVersion = 15962,
         PtVersion = "2.0.0",
         PtOsVersion = 23,
         PackageName = "com.tencent.qq",
-        PackageSign = "V1_WIN_NQ_9.9.7_21159_GW_B",
+        PackageSign = "V1_WIN_NQ_9.9.12_25300_GW_B",
         AppId = 1600001604,
-        SubAppId = 537207105,
-        AppIdQrCode = 537138217,
+        SubAppId = 537226655,
         AppClientVersion = 13172,
         WtLoginSdk = new()
         {
-            SdkBuildTime = 1702888273,
             SdkVersion = "nt.wtlogin.0.0.1",
             MainSigBitmap = 169742560,
-            MiscBitmap = 32764,
+            MiscBitmap = 12058620,
             SubSigBitmap = 0
         },
 
@@ -153,15 +147,15 @@ public class BotAppInfo
         Kernel = "",
         VendorOs = "",
 
-        BaseVersion = "9.0.20.15515",
-        CurrentVersion = "A9.0.20.38faf5bf",
+        BaseVersion = "9.0.50.16545",
+        CurrentVersion = "A9.0.50.a9d8c8dc",
         BuildVersion = 15962,
-        PtVersion = "9.0.20",
+        PtVersion = "9.0.50",
         PtOsVersion = 23,
         PackageName = "com.tencent.mobileqq",
-        PackageSign = "V1_AND_SQ_9.0.20_5844_YYB_D",
+        PackageSign = "V1_AND_SQ_9.0.50_6258_YYB_D",
         AppId = 16,
-        SubAppId = 537206436,
+        SubAppId = 537217916,
         AppKey = "0S200MNJT807V3GE",
         ApkSignatureMd5 = new byte[] { 0xA6, 0xB7, 0x45, 0xBF, 0x24, 0xA2, 0xC2, 0x77, 0x52, 0x77, 0x16, 0xF6, 0xF3, 0x6E, 0xB6, 0x8D },
         AppClientVersion = 0,
@@ -184,15 +178,15 @@ public class BotAppInfo
         Kernel = "",
         VendorOs = "",
 
-        BaseVersion = "9.0.20.15515",
-        CurrentVersion = "A9.0.20.38faf5bf",
+        BaseVersion = "9.0.50.16545",
+        CurrentVersion = "A9.0.50.a9d8c8dc",
         BuildVersion = 15962,
-        PtVersion = "9.0.20",
+        PtVersion = "9.0.50",
         PtOsVersion = 23,
         PackageName = "com.tencent.mobileqq",
-        PackageSign = "V1_AND_SQ_9.0.20_5844_YYB_D",
+        PackageSign = "V1_AND_SQ_9.0.50_6258_YYB_D",
         AppId = 16,
-        SubAppId = 537206475,
+        SubAppId = 537217955,
         AppKey = "0S200MNJT807V3GE",
         ApkSignatureMd5 = new byte[] { 0xA6, 0xB7, 0x45, 0xBF, 0x24, 0xA2, 0xC2, 0x77, 0x52, 0x77, 0x16, 0xF6, 0xF3, 0x6E, 0xB6, 0x8D },
         AppClientVersion = 0,

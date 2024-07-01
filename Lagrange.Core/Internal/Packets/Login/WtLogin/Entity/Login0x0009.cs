@@ -15,7 +15,7 @@ internal class Login0x0009 : Login
         : base(LoginCommand, keystore, appInfo, device) => SsoSeq = ssoSeq;
 
     // Todo: Improve this method
-    protected override BinaryPacket ConstructLogin() => new BinaryPacket()
+    protected override BinaryPacket ConstructTlv() => new BinaryPacket()
         .WriteShort(0x001B)
         .WritePacket(new TlvPacket(0x018, new Tlv018(Keystore, AppInfo)))
         .WritePacket(new TlvPacket(0x001, new Tlv001(Keystore, false)))
@@ -25,7 +25,7 @@ internal class Login0x0009 : Login
         .WritePacket(new TlvPacket(0x107, new Tlv107()))
         .WritePacket(new TlvPacket(0x108, new Tlv108(Keystore)))
         .WritePacket(new TlvPacket(0x142, new Tlv142(AppInfo)))
-        .WritePacket(new TlvPacket(0x144, new Tlv144(Device), (Keystore.TeaImpl, Keystore.Stub.TgtgtKey)))
+        .WritePacket(new TlvPacket(0x144, new Tlv144(Device), (Keystore.TeaImpl, Keystore.Stub.Tgtgt)))
         .WritePacket(new TlvPacket(0x145, new Tlv145(Device)))
         .WritePacket(new TlvPacket(0x147, new Tlv147(AppInfo)))
         .WritePacket(new TlvPacket(0x154, new Tlv154(SsoSeq)))

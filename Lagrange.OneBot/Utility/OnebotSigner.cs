@@ -11,16 +11,16 @@ using ProtoBuf;
 
 namespace Lagrange.Core.Utility.Sign;
 
-internal class OnebotLinuxSigner : SignProvider
+internal class OnebotSigner : SignProvider
 {
     private readonly string Url;
     private readonly string SignUrl;
 
     private readonly HttpClient _client = new();
 
-    public OnebotLinuxSigner(IConfiguration config)
+    public OnebotSigner(IConfiguration config)
     {
-        Url = config["LinuxSignServerUrl"] ?? "";
+        Url = config["SignServerUrl"] ?? "";
         SignUrl = $"{Url}/sign";
     }
 

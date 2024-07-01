@@ -102,7 +102,7 @@ internal class TlvPacker
         var keystore = _injector.GetService<BotKeystore>();
         return encrypt.Type switch
         {
-            TlvEncryptAttribute.KeyType.TgtgtKey => (keystore.TeaImpl, keystore.Stub.TgtgtKey),
+            TlvEncryptAttribute.KeyType.Tgtgt => (keystore.TeaImpl, keystore.Stub.Tgtgt),
             TlvEncryptAttribute.KeyType.PasswordWithSalt => (keystore.TeaImpl, keystore.PasswordWithSalt!),
             _ => null
         };

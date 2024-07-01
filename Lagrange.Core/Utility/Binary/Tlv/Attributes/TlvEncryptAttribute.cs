@@ -9,7 +9,7 @@ internal class TlvEncryptAttribute : Attribute
     
     public enum KeyType
     {
-        TgtgtKey,
+        Tgtgt,
         PasswordWithSalt,
     }
 }

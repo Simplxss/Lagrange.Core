@@ -51,7 +51,7 @@ internal class TransEmpService : BaseService<TransEmpEvent>
 
         if (command == 0x31)
         {
-            var tlvs = TransEmp0x0031.Deserialize(packet, keystore, out var signature);
+            var tlvs = TransEmp0x0031.Deserialize(packet, out var signature);
 
             var tlv017 = (Tlv017)tlvs[0x017];
             var tlv01C = (Tlv01C)tlvs[0x01C];
@@ -65,28 +65,25 @@ internal class TransEmpService : BaseService<TransEmpEvent>
         }
         else
         {
-            var tlvs = TransEmp0x0012.Deserialize(packet, out var state);
+            var tlvs = TransEmp0x0012.Deserialize(packet, out var state, out var uin);
 
             if (state == TransEmp.State.Confirmed)
             {
                 var tlv018 = (Tlv018Response)tlvs[0x018];
                 var tlv019 = (Tlv019)tlvs[0x019];
                 var tlv01E = (Tlv01E)tlvs[0x01E];
-                //var tlv002 = (Tlv002)tlvs[0x002];
-                //var tlv007 = (Tlv007)tlvs[0x007];
-                //var tlv015 = (Tlv015)tlvs[0x015];
-                //var tlv0CE = (Tlv0CE)tlvs[0x0CE];
+                var tlv002 = (Tlv002)tlvs[0x002];
+                var tlv007 = (Tlv007)tlvs[0x007];
+                var tlv015 = (Tlv015)tlvs[0x015];
+                var tlv0CE = (Tlv0CE)tlvs[0x0CE];
 
-                keystore.Stub.TgtgtKey = tlv01E.TgtgtKey;
+                keystore.Uin = (uint)uin;
+                keystore.Stub.Tgtgt = tlv01E.Tgtgt;
                 keystore.Session.A2 = tlv018.A2;
                 keystore.Session.NoPicSig = tlv019.NoPicSig;
+            }
 
-                output = TransEmpEvent.Result((int)state);
-            }
-            else
-            {
-                output = TransEmpEvent.Result((int)state);
-            }
+            output = TransEmpEvent.Result((int)state);
         }
 
         extraEvents = null;

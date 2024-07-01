@@ -142,7 +142,7 @@ internal class HighwayContext : ContextBase, IDisposable
             Uin = upBlock.Uin.ToString(),
             Command = "PicUp.DataUp",
             Seq = upBlock.Sequence,
-            AppId = AppInfo.SubAppId,
+            SubAppId = AppInfo.SubAppId,
             DataFlag = 16,
             CommandId = (uint)upBlock.CommandId,
         };

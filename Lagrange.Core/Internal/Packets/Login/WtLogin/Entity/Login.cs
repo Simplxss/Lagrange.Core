@@ -19,7 +19,7 @@ internal abstract class Login : WtLoginBase
 
     protected override BinaryPacket ConstructData() => new BinaryPacket()
         .WriteUshort(_loginCommand)
-        .WritePacket(ConstructLogin());
+        .WritePacket(ConstructTlv());
 
     public Dictionary<ushort, TlvBody> Deserialize(BinaryPacket packet, BotKeystore keystore, out ushort loginCommand, out State state)
     {
@@ -30,7 +30,7 @@ internal abstract class Login : WtLoginBase
         return TlvPacker.ReadTlvCollections(packet);
     }
 
-    protected abstract BinaryPacket ConstructLogin();
+    protected abstract BinaryPacket ConstructTlv();
 
 
     public enum State : byte

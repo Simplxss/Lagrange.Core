@@ -19,7 +19,6 @@ internal abstract class TransEmp : WtLoginBase
     protected override BinaryPacket ConstructData()
     {
         var packet = new BinaryPacket()
-            .WriteUint((uint)DateTimeOffset.Now.ToUnixTimeSeconds())
             .WriteByte(2)
             .Barrier(w => w
                 .WriteUshort(_qrCodeCommand)
@@ -29,16 +28,17 @@ internal abstract class TransEmp : WtLoginBase
                 .WriteShort(0x32) // Version Code: 50
                 .WriteUint(0) // trans_emp sequence
                 .WriteUlong(0) // dummy uin
-                .WritePacket(ConstructTlv()), Prefix.Uint16 | Prefix.WithPrefix, 2)
+                .WritePacket(ConstructInner()), Prefix.Uint16 | Prefix.WithPrefix, 2)
             .WriteByte(3);
 
         return new BinaryPacket()
             .WriteByte(0x00) // encryptMethod == EncryptMethod.EM_ST || encryptMethod == EncryptMethod.EM_ECDH_ST
-            .WriteUshort((ushort)packet.Length)
+            .WriteUshort((ushort)(packet.Length + 4))
             .WriteUint(AppInfo.AppId)
             .WriteUint(0x72) // Role
             .WriteBytes(Array.Empty<byte>(), Prefix.Uint16 | Prefix.LengthOnly) // uSt
             .WriteBytes(Array.Empty<byte>(), Prefix.Uint8 | Prefix.LengthOnly) // rollback
+            .WriteUint((uint)DateTimeOffset.Now.ToUnixTimeSeconds())
             .WritePacket(packet);
     }
 
@@ -50,8 +50,8 @@ internal abstract class TransEmp : WtLoginBase
         packet.ReadUshort();
         packet.ReadUshort();
         command = packet.ReadUshort();
-        packet.ReadBytes(18);
-        packet.ReadUint();
+        packet.ReadBytes(21);
+        packet.ReadByte();
         packet.ReadUint();
         packet.Skip(14);
         uint appId = packet.ReadUint();
@@ -59,7 +59,7 @@ internal abstract class TransEmp : WtLoginBase
         return packet;
     }
 
-    protected abstract BinaryPacket ConstructTlv();
+    protected abstract BinaryPacket ConstructInner();
 
     internal enum State : byte
     {

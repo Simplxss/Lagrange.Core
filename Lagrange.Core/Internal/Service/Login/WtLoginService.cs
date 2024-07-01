@@ -77,7 +77,7 @@ internal class WtLoginService : BaseService<WtLoginEvent>
             var tlv119 = (Tlv119)tlvs[0x119];
             //var tlv161 = (Tlv161)tlvs[0x161];
 
-            var decrypted = keystore.TeaImpl.Decrypt(tlv119.EncryptedTlv, keystore.Stub.TgtgtKey);
+            var decrypted = keystore.TeaImpl.Decrypt(tlv119.EncryptedTlv, keystore.Stub.Tgtgt);
             tlvs = TlvPacker.ReadTlvCollections(new BinaryPacket(decrypted));
 
             if (tlvs.TryGetValue(0x108, out var tlv108))

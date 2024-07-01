@@ -10,8 +10,8 @@ internal class Tlv016 : TlvBody
 {
     public Tlv016(BotAppInfo appInfo, BotDeviceInfo deviceInfo)
     {
-        SubAppId = appInfo.AppId;
-        AppIdQrCode = appInfo.AppIdQrCode;
+        AppId = appInfo.AppId;
+        SubAppId = appInfo.SubAppId;
         Guid = deviceInfo.System.Guid.ToByteArray();
         PackageName = appInfo.PackageName;
         PtVersion = appInfo.PtVersion;
@@ -20,9 +20,9 @@ internal class Tlv016 : TlvBody
 
     [BinaryProperty] public uint Field0 { get; } = 0; // unknown
     
-    [BinaryProperty] public uint SubAppId { get; }
+    [BinaryProperty] public uint AppId { get; }
     
-    [BinaryProperty] public uint AppIdQrCode { get; }
+    [BinaryProperty] public uint SubAppId { get; }
     
     [BinaryProperty(Prefix.None)] public byte[] Guid { get; }
     
