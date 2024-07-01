@@ -22,8 +22,8 @@ internal class SetNeedToConfirmSwitchService : BaseService<SetNeedToConfirmSwitc
             {
                 Device = new OidbSvcTrpcTcp0x1277_0Device
                 {
-                    Guid = device.Guid.ToByteArray(),
-                    AppId = (uint)appInfo.AppId,
+                    Guid = device.System.Guid.ToByteArray(),
+                    AppId = appInfo.AppId,
                     PackageName = appInfo.PackageName
                 },
                 GuidEncryptedType = false,

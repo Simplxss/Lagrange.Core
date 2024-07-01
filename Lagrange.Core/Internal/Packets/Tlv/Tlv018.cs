@@ -33,5 +33,5 @@ internal class Tlv018 : TlvBody
 [Tlv(0x018, true)]
 internal class Tlv018Response : TlvBody
 {
-    [BinaryProperty(Prefix.None)] public byte[] TempPassword { get; set; }
+    [BinaryProperty(Prefix.None)] public byte[] A2 { get; set; }
 }

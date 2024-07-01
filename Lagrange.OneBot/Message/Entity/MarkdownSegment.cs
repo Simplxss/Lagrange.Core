@@ -22,6 +22,8 @@ public partial class MarkdownSegment : SegmentBase
 
     public override SegmentBase? FromEntity(MessageChain chain, IMessageEntity entity)
     {
-        return null;
+        if (entity is not MarkdownEntity markdownEntity) throw new ArgumentException("Invalid entity type.");
+
+        return new MarkdownSegment(markdownEntity.Data.Content);
     }
 }

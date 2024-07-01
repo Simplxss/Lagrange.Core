@@ -8,7 +8,7 @@ namespace Lagrange.Core.Internal.Packets.Login.NTLogin.Plain.Universal;
 [ProtoContract]
 internal class SsoNTLoginCredentials
 {
-    [ProtoMember(3)] public byte[] TempPassword { get; set; }
+    [ProtoMember(3)] public byte[] A2 { get; set; }
     
     [ProtoMember(4)] public byte[] Tgt { get; set; }
 

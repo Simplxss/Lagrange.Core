@@ -25,7 +25,7 @@ internal class WtExchangeLogic : LogicBase
     private const string Tag = nameof(WtExchangeLogic);
 
     private readonly Timer _reLoginTimer;
-    
+
     private readonly TaskCompletionSource<bool> _transEmpTask;
     private TaskCompletionSource<(string, string)>? _captchaTask;
     private TaskCompletionSource<string>? _newDeviceTask;
@@ -45,6 +45,7 @@ internal class WtExchangeLogic : LogicBase
         switch (e)
         {
             case KickNTEvent kick:
+                await Collection.Business.OperationLogic.SetStatus(21);
                 Collection.Log.LogFatal(Tag, $"KickNTEvent: {kick.Tag}: {kick.Message}");
                 Collection.Log.LogFatal(Tag, "Bot will be offline in 5 seconds...");
                 await Task.Delay(5000);
@@ -108,7 +109,7 @@ internal class WtExchangeLogic : LogicBase
             Collection.Log.LogInfo(Tag, "Session has not expired, using session to login and register status");
             try
             {
-                if (await BotOnline()) return true;
+                return await BotOnline();
             }
             catch
             {
@@ -119,106 +120,80 @@ internal class WtExchangeLogic : LogicBase
 
         if (Collection.AppInfo.Os == "Android")
         {
-            if (Collection.Keystore.Session.TempPassword != null)
+            var wtLoginEvent = WtLoginEvent.Create(WtLoginEvent.State.Login);
+
+        login:
+            var wtLoginResult = await Collection.Business.SendEvent(wtLoginEvent);
+
+            if (wtLoginResult.Count != 0)
             {
-                // Collection.Log.LogInfo(Tag, "Trying to do Exchange...");
-
-                // var exchangeEmpEvent = ExchangeEmpEvent.Create(ExchangeEmpEvent.State.RefreshToken);
-                // var exchangeEmpResult = await Collection.Business.SendEvent(exchangeEmpEvent);
-
-                // if (exchangeEmpResult.Count != 0)
-                // {
-                //     var @event = (ExchangeEmpEvent)exchangeEmpResult[0];
-                //     if ((ExchangeEmp.State)@event.ResultCode != ExchangeEmp.State.Success)
-                //     {
-                //         Collection.Log.LogWarning(Tag, @event is { Message: not null, Tag: not null }
-                //             ? $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode}) | {@event.Tag}: {@event.Message}"
-                //             : $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode})");
-                //         return false;
-                //     }
-
-                //     Collection.Log.LogInfo(Tag, "Exchange Success");
-                // }
-
-                return await BotOnline();
-            }
-            else
-            {
-                var wtLoginEvent = WtLoginEvent.Create(WtLoginEvent.State.Login);
-
-            login:
-                var wtLoginResult = await Collection.Business.SendEvent(wtLoginEvent);
-
-                if (wtLoginResult.Count != 0)
+                var @event = (WtLoginEvent)wtLoginResult[0];
+                switch ((LoginCommon.State)@event.ResultCode)
                 {
-                    var @event = (WtLoginEvent)wtLoginResult[0];
-                    switch ((LoginCommon.State)@event.ResultCode)
-                    {
-                        case LoginCommon.State.Success:
-                            {
-                                Collection.Log.LogInfo(Tag, "Login Success");
+                    case LoginCommon.State.Success:
+                        {
+                            Collection.Log.LogInfo(Tag, "Login Success");
 
-                                return await BotOnline();
-                            }
-                        case LoginCommon.State.CaptchaVerify:
-                            {
-                                Collection.Log.LogInfo(Tag, "Login Success, but captcha is required, please follow the link from event");
+                            return await BotOnline();
+                        }
+                    case LoginCommon.State.CaptchaVerify:
+                        {
+                            Collection.Log.LogInfo(Tag, "Login Success, but captcha is required, please follow the link from event");
 
-                                if (Collection.Keystore.Session.CaptchaUrl != null)
+                            if (Collection.Keystore.Session.CaptchaUrl != null)
+                            {
+                                var captchaEvent = new BotCaptchaEvent(Collection.Keystore.Session.CaptchaUrl);
+                                Collection.Invoker.PostEvent(captchaEvent);
+
+                                string aid;
+                                try
                                 {
-                                    var captchaEvent = new BotCaptchaEvent(Collection.Keystore.Session.CaptchaUrl);
-                                    Collection.Invoker.PostEvent(captchaEvent);
-
-                                    string aid;
-                                    try
-                                    {
-                                        aid = Collection.Keystore.Session.CaptchaUrl.Split("&sid=")[1].Split("&")[0];
-                                    }
-                                    catch
-                                    {
-                                        aid = "";
-                                    }
-                                    _captchaTask = new TaskCompletionSource<(string, string)>();
-                                    var (ticket, randStr) = await _captchaTask.Task;
-                                    Collection.Keystore.Session.Captcha = new ValueTuple<string, string, string>(ticket, randStr, aid);
-
-                                    wtLoginEvent = WtLoginEvent.Create(WtLoginEvent.State.SubmitCaptcha);
-                                    goto login;
+                                    aid = Collection.Keystore.Session.CaptchaUrl.Split("&sid=")[1].Split("&")[0];
                                 }
-
-                                Collection.Log.LogInfo(Tag, "Captcha Url is null, please try again later");
-                                return false;
-                            }
-                        case LoginCommon.State.DeviceLock2:
-                            {
-                                Collection.Log.LogInfo(Tag, "Login Success, but sms code is required, are you sure send sms?");
-
-                                if (Collection.Keystore.Session.PhoneNumber != null)
+                                catch
                                 {
-                                    var newDeviceEvent = new BotNewDeviceVerifyEvent(Collection.Keystore.Session.PhoneNumber);
-                                    Collection.Invoker.PostEvent(newDeviceEvent);
-
-                                    _newDeviceTask = new TaskCompletionSource<string>();
-                                    var smsCode = await _newDeviceTask.Task; // need to add timeout
-                                    Collection.Keystore.Session.SmsCode = smsCode;
-
-                                    wtLoginEvent = WtLoginEvent.Create(WtLoginEvent.State.SubmitSmsCode);
-                                    goto login;
+                                    aid = "";
                                 }
+                                _captchaTask = new TaskCompletionSource<(string, string)>();
+                                var (ticket, randStr) = await _captchaTask.Task;
+                                Collection.Keystore.Session.Captcha = new ValueTuple<string, string, string>(ticket, randStr, aid);
 
-                                Collection.Log.LogInfo(Tag, "Phone Number is null, please try again later");
-                                return false;
+                                wtLoginEvent = WtLoginEvent.Create(WtLoginEvent.State.SubmitCaptcha);
+                                goto login;
                             }
-                        default:
+
+                            Collection.Log.LogInfo(Tag, "Captcha Url is null, please try again later");
+                            return false;
+                        }
+                    case LoginCommon.State.DeviceLock2:
+                        {
+                            Collection.Log.LogInfo(Tag, "Login Success, but sms code is required, are you sure send sms?");
+
+                            if (Collection.Keystore.Session.PhoneNumber != null)
                             {
-                                Collection.Log.LogWarning(Tag, @event is { Message: not null, Tag: not null }
-                                    ? $"Login Failed: {(LoginCommon.State)@event.ResultCode} ({@event.ResultCode}) | {@event.Tag}: {@event.Message}"
-                                    : $"Login Failed: {(LoginCommon.State)@event.ResultCode} ({@event.ResultCode})");
+                                var newDeviceEvent = new BotNewDeviceVerifyEvent(Collection.Keystore.Session.PhoneNumber);
+                                Collection.Invoker.PostEvent(newDeviceEvent);
 
-                                Collection.Invoker.Dispose();
-                                return false;
+                                _newDeviceTask = new TaskCompletionSource<string>();
+                                var smsCode = await _newDeviceTask.Task; // need to add timeout
+                                Collection.Keystore.Session.SmsCode = smsCode;
+
+                                wtLoginEvent = WtLoginEvent.Create(WtLoginEvent.State.SubmitSmsCode);
+                                goto login;
                             }
-                    }
+
+                            Collection.Log.LogInfo(Tag, "Phone Number is null, please try again later");
+                            return false;
+                        }
+                    default:
+                        {
+                            Collection.Log.LogWarning(Tag, @event is { Message: not null, Tag: not null }
+                                ? $"Login Failed: {(LoginCommon.State)@event.ResultCode} ({@event.ResultCode}) | {@event.Tag}: {@event.Message}"
+                                : $"Login Failed: {(LoginCommon.State)@event.ResultCode} ({@event.ResultCode})");
+
+                            Collection.Invoker.Dispose();
+                            return false;
+                        }
                 }
             }
         }
@@ -233,7 +208,7 @@ internal class WtExchangeLogic : LogicBase
                 }
             }
 
-            if (Collection.Keystore.Session.TempPassword != null) // try EasyLogin
+            if (Collection.Keystore.Session.A2 != null) // try EasyLogin
             {
                 Collection.Log.LogInfo(Tag, "Trying to Login by EasyLogin...");
                 var easyLoginEvent = EasyLoginEvent.Create();
@@ -278,7 +253,7 @@ internal class WtExchangeLogic : LogicBase
                             {
                                 Collection.Log.LogWarning(Tag, $"Fast Login Failed with code {easyLoginResult[0].ResultCode}, trying to Login by Password...");
 
-                                Collection.Keystore.Session.TempPassword = null; // clear temp password
+                                Collection.Keystore.Session.A2 = null; // clear temp password
                                 return await LoginByPassword(); // try password login
                             }
                     }
@@ -371,7 +346,7 @@ internal class WtExchangeLogic : LogicBase
                                     {
                                         Collection.Scheduler.Cancel(QueryEvent);  // cancel the event
 
-                                        Collection.Keystore.Session.TempPassword = Encoding.UTF8.GetBytes(responseJson.StrNtSuccToken);
+                                        Collection.Keystore.Session.A2 = Encoding.UTF8.GetBytes(responseJson.StrNtSuccToken);
                                         _transEmpTask.SetResult(true);
                                         client.Dispose();
                                     }
@@ -539,31 +514,25 @@ internal class WtExchangeLogic : LogicBase
 
     public async Task<bool> BotOnline(BotOnlineEvent.OnlineReason reason = BotOnlineEvent.OnlineReason.Login)
     {
-        var registerEvent = StatusRegisterEvent.Create();
+        var registerEvent = InfoSyncEvent.Create();
         var registerResponse = await Collection.Business.SendEvent(registerEvent);
-        var heartbeatDelegate = new Action(async () => await Collection.Business.PushEvent(SsoAliveEvent.Create()));
 
         if (registerResponse.Count != 0)
         {
-            var resp = (StatusRegisterEvent)registerResponse[0];
+            var resp = (InfoSyncEvent)registerResponse[0];
             Collection.Log.LogInfo(Tag, $"Register Status: {resp.Message}");
-            Collection.Scheduler.Interval("SsoHeartBeat", (int)(4.5 * 60 * 1000), heartbeatDelegate);
 
             var onlineEvent = new BotOnlineEvent(reason);
             Collection.Invoker.PostEvent(onlineEvent);
-
-            for (int i = 0; i < 3; i++)
-            {
-                var fetchUidEvent = FetchUserInfoEvent.Create("u_x7QQfIu9U0UPlNTO_zmNZQ");
-                var results = await Collection.Business.SendEvent(fetchUidEvent);
-                await Task.Delay(30000);
-            }
 
             await Collection.Business.PushEvent(InfoSyncEvent.Create());
 
             bool result = resp.Message.Contains("register success");
             if (result)
             {
+                var heartbeatDelegate = new Action(async () => await Collection.Business.PushEvent(SsoAliveEvent.Create()));
+                Collection.Scheduler.Interval("SsoHeartBeat", (int)(4.5 * 60 * 1000), heartbeatDelegate);
+
                 _reLoginTimer.Change(TimeSpan.FromDays(15), TimeSpan.FromDays(15));
                 Collection.Log.LogInfo(Tag, "AutoReLogin Enabled, session would be refreshed in 15 days period");
             }
@@ -596,51 +565,68 @@ internal class WtExchangeLogic : LogicBase
         return result.Count != 0 && ((UnusualEasyLoginEvent)result[0]).Success;
     }
 
-    private async Task ReLogin()
+    private async Task<bool> ReLogin()
     {
         Collection.Log.LogInfo(Tag, "Session is about to expire, try to relogin and refresh");
-        if (Collection.Keystore.Session.TempPassword == null)
+        if (Collection.Keystore.Session.A2 == null)
         {
             Collection.Log.LogInfo(Tag, "A2 is null, abort");
-            return;
+            return false;
         }
-        
-        var d2 = Collection.Keystore.Session.D2;
-        var d2Key = Collection.Keystore.Session.D2Key;
-        var tgt = Collection.Keystore.Session.Tgt; // save the original state
-        
-        Collection.Socket.Disconnect();
-        Collection.Keystore.ClearSession();
-        await Collection.Socket.Connect();
 
-        if (await KeyExchange())
+        if (Collection.AppInfo.Os == "Android")
         {
-            var easyLoginEvent = EasyLoginEvent.Create();
-            var easyLoginResult = await Collection.Business.SendEvent(easyLoginEvent);
-            if (easyLoginResult.Count != 0)
+            Collection.Log.LogInfo(Tag, "Trying to do Exchange(RefreshD2)...");
+
+            var exchangeEmpEvent = ExchangeEmpEvent.Create(ExchangeEmpEvent.State.RefreshD2);
+            var exchangeEmpResult = await Collection.Business.SendEvent(exchangeEmpEvent);
+
+            if (exchangeEmpResult.Count != 0)
             {
-                var result = (EasyLoginEvent)easyLoginResult[0];
-                if ((LoginCommon.Error)result.ResultCode == LoginCommon.Error.Success)
+                var @event = (ExchangeEmpEvent)exchangeEmpResult[0];
+                if ((ExchangeEmp.State)@event.ResultCode == ExchangeEmp.State.Success)
                 {
-                    Collection.Log.LogInfo(Tag, "Login Success, try to register services");
-                    if (await BotOnline(BotOnlineEvent.OnlineReason.Reconnect)) return; 
-                    
-                    Collection.Log.LogInfo(Tag, "Re-login failed, please refresh manually");
+                    Collection.Log.LogInfo(Tag, "Exchange Success");
+                }
+                else
+                {
+                    Collection.Log.LogWarning(Tag, @event is { Message: not null, Tag: not null }
+                        ? $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode}) | {@event.Tag}: {@event.Message}"
+                        : $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode})");
+                    return false;
                 }
             }
         }
         else
         {
-            Collection.Log.LogInfo(Tag, "Key Exchange Failed, trying to online, please refresh manually");
+            if (await KeyExchange())
+            {
+                var easyLoginEvent = EasyLoginEvent.Create();
+                var easyLoginResult = await Collection.Business.SendEvent(easyLoginEvent);
+                if (easyLoginResult.Count != 0)
+                {
+                    var result = (EasyLoginEvent)easyLoginResult[0];
+                    if ((LoginCommon.Error)result.ResultCode == LoginCommon.Error.Success)
+                    {
+                        Collection.Log.LogInfo(Tag, "Login Success, try to register services");
+                    }
+                    else
+                    {
+                        Collection.Log.LogInfo(Tag, "Re-login failed, please refresh manually");
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                Collection.Log.LogInfo(Tag, "Key Exchange Failed, trying to online, please refresh manually");
+                return false;
+            }
         }
-        
-        Collection.Keystore.Session.D2 = d2;
-        Collection.Keystore.Session.D2Key = d2Key;
-        Collection.Keystore.Session.Tgt = tgt;
 
-        await BotOnline(BotOnlineEvent.OnlineReason.Reconnect);
+        return await BotOnline(BotOnlineEvent.OnlineReason.Reconnect);
     }
-    
+
     public bool SubmitCaptcha(string ticket, string randStr) => _captchaTask?.TrySetResult((ticket, randStr)) ?? false;
     public bool SubmitSmsCode(string smsCode) => _newDeviceTask?.TrySetResult(smsCode) ?? false;
 }

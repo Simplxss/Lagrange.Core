@@ -17,9 +17,9 @@ internal class UnusualEasyLoginService : BaseService<UnusualEasyLoginEvent>
     protected override bool Build(UnusualEasyLoginEvent input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
         out BinaryPacket output, out List<BinaryPacket>? extraPackets)
     {
-        if (keystore.Session.TempPassword == null) throw new InvalidOperationException("TempPassword is null");
+        if (keystore.Session.A2 == null) throw new InvalidOperationException("A2 is null");
 
-        output = SsoNTLoginCommon.BuildNTLoginPacket(keystore, appInfo, device, keystore.Session.TempPassword);
+        output = SsoNTLoginCommon.BuildNTLoginPacket(keystore, appInfo, device, keystore.Session.A2);
         extraPackets = null;
         return true;
     }
@@ -46,7 +46,7 @@ internal class UnusualEasyLoginService : BaseService<UnusualEasyLoginEvent>
                 keystore.Session.Tgt = body.Credentials.Tgt;
                 keystore.Session.D2 = body.Credentials.D2;
                 keystore.Session.D2Key = body.Credentials.D2Key;
-                keystore.Session.TempPassword = body.Credentials.TempPassword;
+                keystore.Session.A2 = body.Credentials.A2;
                 keystore.Session.SessionDate = DateTime.Now;
 
                 output = UnusualEasyLoginEvent.Result(0);

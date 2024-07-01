@@ -8,11 +8,11 @@ using ProtoBuf;
 
 namespace Lagrange.Core.Internal.Service.System;
 
-[EventSubscribe(typeof(StatusRegisterEvent))]
+[EventSubscribe(typeof(InfoSyncEvent))]
 [Service("trpc.msg.register_proxy.RegisterProxy.SsoInfoSync")]
-internal class StatusRegisterService : BaseService<StatusRegisterEvent>
+internal class StatusRegisterService : BaseService<InfoSyncEvent>
 {
-    protected override bool Build(StatusRegisterEvent input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
+    protected override bool Build(InfoSyncEvent input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
         out BinaryPacket output, out List<BinaryPacket>? extraPackets)
     {
         var packet = new SsoInfoSyncRequest
@@ -81,11 +81,11 @@ internal class StatusRegisterService : BaseService<StatusRegisterEvent>
     }
 
     protected override bool Parse(Span<byte> input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
-        out StatusRegisterEvent output, out List<ProtocolEvent>? extraEvents)
+        out InfoSyncEvent output, out List<ProtocolEvent>? extraEvents)
     {
         var response = Serializer.Deserialize<SsoInfoSyncResponse>(input);
 
-        output = StatusRegisterEvent.Result(response?.RegisterInfoResponse?.Message ?? "IDK");
+        output = InfoSyncEvent.Result(response?.RegisterInfoResponse?.Message ?? "IDK");
         extraEvents = null;
         return true;
     }

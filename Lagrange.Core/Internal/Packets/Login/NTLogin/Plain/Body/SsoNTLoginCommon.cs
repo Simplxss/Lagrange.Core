@@ -35,7 +35,7 @@ internal static class SsoNTLoginCommon
                 },
                 Cookie = new SsoNTLoginCookie { Cookie = keystore.Session.UnusualCookies }
             },
-            Body = new SsoNTLoginEasyLogin { TempPassword = body, }
+            Body = new SsoNTLoginEasyLogin { A2 = body, }
         };
 
         if (keystore.Session.Captcha is not null)

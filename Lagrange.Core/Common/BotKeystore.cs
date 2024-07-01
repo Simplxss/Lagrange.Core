@@ -66,7 +66,7 @@ public class BotKeystore
         public DateTime SessionDate { get; set; }
         public byte[]? NoPicSig { get; set; } // size: 80, may be from Tlv019, for Tlv16A
         public byte[] StWebSig { get; set; } = Array.Empty<byte>(); // from tlv103, size: 64
-        public byte[]? TempPassword { get; set; } // from tlv106, size: 160?
+        public byte[]? A2 { get; set; } // from tlv106, size: 160?
         public byte[] Tgt { get; set; } = Array.Empty<byte>(); // from tlv10A, size: 72
         public byte[] Tgtgt { get; set; } = Array.Empty<byte>(); // from tlv10C, size: 16
         public byte[] TgtKey { get; set; } = Array.Empty<byte>(); // from tlv10D, size: 16

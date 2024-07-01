@@ -8,6 +8,7 @@ using ProtoBuf;
 
 namespace Lagrange.Core.Message.Entity;
 
+[MessageElement(typeof(CommonElem))]
 public class KeyboardEntity : IMessageEntity
 {
     public KeyboardData Data { get; set; }
@@ -31,9 +32,18 @@ public class KeyboardEntity : IMessageEntity
         }
     };
 
-    IMessageEntity? IMessageEntity.UnpackElement(Elem elem) => null;
+    IMessageEntity? IMessageEntity.UnpackElement(Elem elem)
+    {
+        if (elem is { CommonElem: { ServiceType: 46, BusinessType: 1 } common })
+        {
+            var button = Serializer.Deserialize<ButtonExtra>(common.PbElem.AsSpan());
+            return new KeyboardEntity(button.Data);
+        }
 
-    public string ToPreviewString() => throw new NotImplementedException();
+        return null;
+    }
+
+    public string ToPreviewString() => $"[{nameof(KeyboardEntity)}] {JsonSerializer.Serialize(Data)}";
 }
 
 # region Json & Protobuf

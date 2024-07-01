@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Lagrange.Core.Internal.Packets.Message.Element;
 using Lagrange.Core.Internal.Packets.Message.Element.Implementation;
 using Lagrange.Core.Utility.Extension;
@@ -7,16 +5,17 @@ using ProtoBuf;
 
 namespace Lagrange.Core.Message.Entity;
 
+[MessageElement(typeof(CommonElem))]
 public class MarkdownEntity : IMessageEntity
 {
     public MarkdownData Data { get; set; }
-    
+
     internal MarkdownEntity() => Data = new MarkdownData();
-    
+
     public MarkdownEntity(MarkdownData data) => Data = data;
-    
-    public MarkdownEntity(string data) => Data = JsonSerializer.Deserialize<MarkdownData>(data) ?? throw new Exception();
-    
+
+    public MarkdownEntity(string data) => Data = new MarkdownData() { Content = data };
+
     IEnumerable<Elem> IMessageEntity.PackElement() => new Elem[]
     {
         new()
@@ -30,14 +29,23 @@ public class MarkdownEntity : IMessageEntity
         }
     };
 
-    IMessageEntity? IMessageEntity.UnpackElement(Elem elem) => null;
+    IMessageEntity? IMessageEntity.UnpackElement(Elem elem)
+    {
+        if (elem is { CommonElem: { ServiceType: 45, BusinessType: 1 } common })
+        {
+            var markdown = Serializer.Deserialize<MarkdownData>(common.PbElem.AsSpan());
+            return new MarkdownEntity(markdown);
+        }
 
-    public string ToPreviewString() => throw new NotImplementedException();
+        return null;
+    }
+
+    public string ToPreviewString() => $"[{nameof(MarkdownEntity)}] {Data.Content}";
 }
 
 [ProtoContract]
 public class MarkdownData
 {
-    [JsonPropertyName("content")] [ProtoMember(1)]
+    [ProtoMember(1)]
     public string Content { get; set; } = string.Empty;
 }

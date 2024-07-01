@@ -86,7 +86,7 @@ internal static class Program
             SaveKeystore(bot.UpdateKeystore());
         };
 
-        if (keyStore.Session.TempPassword == null)
+        if (keyStore.Session.A2 == null)
         {
             await new WtLoginTest().LoginByQrCode(bot);
             Console.WriteLine("Please login by QrCode first");

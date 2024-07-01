@@ -85,7 +85,7 @@ internal class WtLoginService : BaseService<WtLoginEvent>
             var tlv16A = (Tlv16AResponse)tlvs[0x16A];
             keystore.Session.NoPicSig = tlv16A.NoPicSig;
             var tlv106 = (Tlv106Response)tlvs[0x106];
-            keystore.Session.TempPassword = tlv106.TempPassword;
+            keystore.Session.A2 = tlv106.A2;
             var tlv10C = (Tlv10C)tlvs[0x10C];
             keystore.Session.Tgtgt = tlv10C.Tgtgt;
             var tlv10A = (Tlv10A)tlvs[0x10A];
@@ -132,6 +132,8 @@ internal class WtLoginService : BaseService<WtLoginEvent>
             keystore.Session.D2Key = tlv305.D2Key;
             var tlv143 = (Tlv143Response)tlvs[0x143];
             keystore.Session.D2 = tlv143.D2;
+            keystore.Session.SessionDate = DateTime.Now;
+
             //var tlv118 = (Tlv118)tlvs[0x118];
             var tlv543 = (Tlv543)tlvs[0x543];
             keystore.Uid = tlv543.Layer1.Layer2.Uid;

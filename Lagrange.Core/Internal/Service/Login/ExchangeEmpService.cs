@@ -89,7 +89,7 @@ internal class ExchangeEmpService : BaseService<ExchangeEmpEvent>
 
 
             keystore.Session.NoPicSig = tlv16A.NoPicSig;
-            keystore.Session.TempPassword = tlv106.TempPassword;
+            keystore.Session.A2 = tlv106.A2;
             keystore.Session.Tgtgt = tlv10C.Tgtgt;
             keystore.Session.Tgt = tlv10A.Tgt;
             keystore.Session.TgtKey = tlv10D.TgtKey;

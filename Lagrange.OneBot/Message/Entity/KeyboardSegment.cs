@@ -22,6 +22,8 @@ public partial class KeyboardSegment : SegmentBase
 
     public override SegmentBase? FromEntity(MessageChain chain, IMessageEntity entity)
     {
-        return null;
+        if (entity is not KeyboardEntity keyboardEntity) throw new ArgumentException("Invalid entity type.");
+
+        return new KeyboardSegment(keyboardEntity.Data);
     }
 }

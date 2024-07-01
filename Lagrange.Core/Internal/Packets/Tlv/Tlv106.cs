@@ -12,7 +12,7 @@ namespace Lagrange.Core.Internal.Packets.Tlv;
 internal class Tlv106 : TlvBody
 {
     /// <summary>
-    /// <para>manually construct Tlv106 by tempPassword, from TlvQrCode18, not through dependency injection</para>
+    /// <para>manually construct Tlv106 by A2, from TlvQrCode18, not through dependency injection</para>
     /// <para>This field does not only use as the request, but also response</para>
     /// <para>Response should be referred to <see cref="SsoNTLoginEasyLogin"/></para>
 
@@ -54,13 +54,13 @@ internal class Tlv106 : TlvBody
 [Tlv(0x106)]
 internal class Tlv106V2 : TlvBody
 {
-    public Tlv106V2(BotKeystore keystore) => TempPassword = keystore.Session.TempPassword ?? Array.Empty<byte>();
+    public Tlv106V2(BotKeystore keystore) => A2 = keystore.Session.A2 ?? Array.Empty<byte>();
 
-    [BinaryProperty(Prefix.None)] public byte[] TempPassword { get; set; }
+    [BinaryProperty(Prefix.None)] public byte[] A2 { get; set; }
 }
 
 [Tlv(0x106, true)]
 internal class Tlv106Response : TlvBody
 {
-    [BinaryProperty(Prefix.None)] public byte[] TempPassword { get; set; }
+    [BinaryProperty(Prefix.None)] public byte[] A2 { get; set; }
 }

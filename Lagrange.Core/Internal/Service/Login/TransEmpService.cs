@@ -78,7 +78,7 @@ internal class TransEmpService : BaseService<TransEmpEvent>
                 //var tlv0CE = (Tlv0CE)tlvs[0x0CE];
 
                 keystore.Stub.TgtgtKey = tlv01E.TgtgtKey;
-                keystore.Session.TempPassword = tlv018.TempPassword;
+                keystore.Session.A2 = tlv018.A2;
                 keystore.Session.NoPicSig = tlv019.NoPicSig;
 
                 output = TransEmpEvent.Result((int)state);

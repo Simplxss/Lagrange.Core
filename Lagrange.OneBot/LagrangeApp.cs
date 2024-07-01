@@ -77,7 +77,7 @@ public class LagrangeApp : IHost
         };
         
         if (string.IsNullOrEmpty(Configuration["Account:Password"]) &&
-            Instance.ContextCollection.Keystore.Session.TempPassword == null) // EasyLogin and PasswordLogin is both disabled
+            Instance.ContextCollection.Keystore.Session.A2 == null) // EasyLogin and PasswordLogin is both disabled
         {
             Logger.LogInformation("Session expired or Password not filled in, try to login by QrCode");
 
