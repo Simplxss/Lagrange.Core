@@ -40,7 +40,7 @@ internal class EasyLoginService : BaseService<EasyLoginEvent>
             {
                 output = EasyLoginEvent.Result((int)(response.Header?.Error?.ErrorCode ?? 1));
 
-                keystore.Session.UnusualSign = body?.Unusual?.Sig;
+                // keystore.Session.UnusualSign = body?.Unusual?.Sig;
                 keystore.Session.UnusualCookies = response.Header?.Cookie?.Cookie;
             }
             else
