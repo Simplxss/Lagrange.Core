@@ -109,6 +109,7 @@ internal class WtExchangeLogic : LogicBase
             Collection.Log.LogInfo(Tag, "Session has not expired, using session to login and register status");
             try
             {
+                await ReLogin();
                 return await BotOnline();
             }
             catch

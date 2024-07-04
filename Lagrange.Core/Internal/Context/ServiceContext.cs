@@ -2,9 +2,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using Lagrange.Core.Common;
 using Lagrange.Core.Internal.Event;
-using Lagrange.Core.Internal.Event.Login;
 using Lagrange.Core.Internal.Packets;
-using Lagrange.Core.Internal.Packets.Login.WtLogin.Entity;
 using Lagrange.Core.Internal.Service;
 using Lagrange.Core.Utility.Extension;
 
