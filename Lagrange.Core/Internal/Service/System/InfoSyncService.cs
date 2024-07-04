@@ -10,7 +10,7 @@ namespace Lagrange.Core.Internal.Service.System;
 
 [EventSubscribe(typeof(InfoSyncEvent))]
 [Service("trpc.msg.register_proxy.RegisterProxy.SsoInfoSync")]
-internal class StatusRegisterService : BaseService<InfoSyncEvent>
+internal class InfoSyncService : BaseService<InfoSyncEvent>
 {
     protected override bool Build(InfoSyncEvent input, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device,
         out BinaryPacket output, out List<BinaryPacket>? extraPackets)
@@ -44,12 +44,12 @@ internal class StatusRegisterService : BaseService<InfoSyncEvent>
                 CurrentVersion = appInfo.CurrentVersion,
                 IsFirstRegisterProxyOnline = 1,
                 LocaleId = 2052,
-                DeviceInfo = new OnlineDeviceInfo
+                DeviceInfo = new DeviceInfo
                 {
                     DevName = device.Model.DeviceName,
                     DevType = appInfo.Kernel,
-                    OsVer = device.System.OsType,
-                    Brand = "",
+                    OsVer = device.System.OsVersion,
+                    Brand = device.System.OsType,
                     VendorOsName = appInfo.VendorOs,
                 },
                 SetMute = 0,

@@ -18,7 +18,7 @@ internal class RegisterInfo
     
     [ProtoMember(5)] public int? LocaleId { get; set; } // 2052
     
-    [ProtoMember(6)] public OnlineDeviceInfo? DeviceInfo { get; set; }
+    [ProtoMember(6)] public DeviceInfo? DeviceInfo { get; set; }
     
     [ProtoMember(7)] public int? SetMute { get; set; }
     

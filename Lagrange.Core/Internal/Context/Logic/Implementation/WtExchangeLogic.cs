@@ -45,7 +45,7 @@ internal class WtExchangeLogic : LogicBase
         switch (e)
         {
             case KickNTEvent kick:
-                await Collection.Business.OperationLogic.SetStatus(21);
+                await BotOffline();
                 Collection.Log.LogFatal(Tag, $"KickNTEvent: {kick.Tag}: {kick.Message}");
                 Collection.Log.LogFatal(Tag, "Bot will be offline in 5 seconds...");
                 await Task.Delay(5000);
@@ -515,18 +515,16 @@ internal class WtExchangeLogic : LogicBase
 
     public async Task<bool> BotOnline(BotOnlineEvent.OnlineReason reason = BotOnlineEvent.OnlineReason.Login)
     {
-        var registerEvent = InfoSyncEvent.Create();
-        var registerResponse = await Collection.Business.SendEvent(registerEvent);
+        var infoSyncEvent = InfoSyncEvent.Create();
+        var infoSyncResponse = await Collection.Business.SendEvent(infoSyncEvent);
 
-        if (registerResponse.Count != 0)
+        if (infoSyncResponse.Count != 0)
         {
-            var resp = (InfoSyncEvent)registerResponse[0];
+            var resp = (InfoSyncEvent)infoSyncResponse[0];
             Collection.Log.LogInfo(Tag, $"Register Status: {resp.Message}");
 
             var onlineEvent = new BotOnlineEvent(reason);
             Collection.Invoker.PostEvent(onlineEvent);
-
-            await Collection.Business.PushEvent(InfoSyncEvent.Create());
 
             bool result = resp.Message.Contains("register success");
             if (result)
@@ -542,6 +540,12 @@ internal class WtExchangeLogic : LogicBase
         }
 
         return false;
+    }
+
+    public async Task BotOffline()
+    {
+        var unRegisterEvent = StatusUnRegisterEvent.Create();
+        await Collection.Business.SendEvent(unRegisterEvent);
     }
 
     private async Task<bool> FetchUnusual()
