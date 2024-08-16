@@ -32,61 +32,49 @@ internal abstract class WtLoginBase
     {
         var body = ConstructData();
 
-        var packet = new BinaryPacket().WriteByte(2); // packet start
+        var packet = new BinaryPacket()
+            .WriteByte(2) // packet start
+            .Barrier(w => {
+                w.WriteUshort(0x1F41) // ver
+                    .WriteUshort(Cmd) // cmd: [wtlogin.login, wtlogin.exchange_emp]: 2064, wtlogin.trans_emp: 2066
+                    .WriteUshort(Keystore.Session.Sequence) // unique wtLoginSequence for wtlogin packets only, should be stored in KeyStore
+                    .WriteUint(Keystore.Uin) // uin, 0 for wtlogin.trans_emp
+                    .WriteByte(3) // extVer
+                    .WriteByte(CmdVer) // cmdVer: share_key: 135, wt_session_key: 69
+                    .WriteUint(0) // actually unknown const 0
+                    .WriteByte(PubId) // pubId (android: 2, windows 17, other 19?)
+                    .WriteUshort(0) // insId
+                    .WriteUshort(AppInfo.AppClientVersion) // cliType(android: 0, windows: 13172)
+                    .WriteUint(0); // retryTime
 
-        switch (Command)
-        {
-            case "wtlogin.login":
-            case "wtlogin.trans_emp":
+                switch (CmdVer)
                 {
-                    Keystore.Stub.RandomKey = ByteGen.GenRandomBytes(16);
-                    var encrypt = Keystore.TeaImpl.Encrypt(body.ToArray(), EcdhImpl.ShareKey);
+                    case 0x87:
+                        {
+                            Keystore.Stub.RandomKey = ByteGen.GenRandomBytes(16);
+                            var encrypt = Keystore.TeaImpl.Encrypt(body.ToArray(), EcdhImpl.ShareKey);
 
-                    packet.Barrier(w => w
-                        .WriteUshort(0x1F41) // ver
-                        .WriteUshort(Cmd) // cmd: [wtlogin.login, wtlogin.exchange_emp]: 2064, wtlogin.trans_emp: 2066
-                        .WriteUshort(Keystore.Session.Sequence) // unique wtLoginSequence for wtlogin packets only, should be stored in KeyStore
-                        .WriteUint(Keystore.Uin) // uin, 0 for wtlogin.trans_emp
-                        .WriteByte(3) // extVer
-                        .WriteByte(CmdVer) // cmdVer: [wtlogin.trans_emp, wtlogin.login]: 135, wtlogin.exchange_emp: 69
-                        .WriteUint(0) // actually unknown const 0
-                        .WriteByte(PubId) // pubId (android: 2, windows 17, other 19?)
-                        .WriteUshort(0) // insId
-                        .WriteUshort(AppInfo.AppClientVersion) // cliType(android: 0, windows: 13172)
-                        .WriteUint(0) // retryTime
-                        .WriteByte(2) // curve type: Secp192K1: 1 (used by pcnt), Prime256V1: 2 (used by android)
-                        .WriteByte(1) // rollback flag
-                        .WriteBytes(Keystore.Stub.RandomKey, Prefix.None) // randKey
-                        .WriteUshort(0x0131) // android: 0x0131, windows: 0x0102
-                        .WriteUshort(0x0001) // public_key_ver (only for Prime256V1)(client: 0x0001, http: 0x0002)
-                        .WriteBytes(EcdhImpl.GetPublicKey(false), Prefix.Uint16 | Prefix.LengthOnly) // pubKey
-                        .WriteBytes(encrypt, Prefix.None), Prefix.Uint16 | Prefix.WithPrefix, 2);
-                    break;
+                            w.WriteByte(2) // curve type: Secp192K1: 1 (used by pcnt), Prime256V1: 2 (used by android)
+                                .WriteByte(1) // rollback flag
+                                .WriteBytes(Keystore.Stub.RandomKey, Prefix.None) // randKey
+                                .WriteUshort(0x0131) // android: 0x0131, windows: 0x0102
+                                .WriteUshort(0x0001) // public_key_ver (only for Prime256V1)(client: 0x0001, http: 0x0002)
+                                .WriteBytes(EcdhImpl.GetPublicKey(false), Prefix.Uint16 | Prefix.LengthOnly) // pubKey
+                                .WriteBytes(encrypt, Prefix.None);
+                            break;
+                        }
+                    case 0x45:
+                        {
+                            var encrypt = Keystore.TeaImpl.Encrypt(body.ToArray(), Keystore.Session.WtSessionTicketKey);
+
+                            w.WriteBytes(Keystore.Session.WtSessionTicket, Prefix.Uint16 | Prefix.LengthOnly)
+                                .WriteBytes(encrypt, Prefix.None);
+                            break;
+                        }
+                    default: throw new Exception($"Unknown wtlogin CmdVer: {Command}");
                 }
-            case "wtlogin.exchange_emp":
-                {
-                    var encrypt = Keystore.TeaImpl.Encrypt(body.ToArray(), Keystore.Session.WtSessionTicketKey);
-
-                    packet.Barrier(w => w
-                        .WriteUshort(0x1F41) // ver
-                        .WriteUshort(Cmd) // cmd: [wtlogin.login, wtlogin.exchange_emp]: 2064, wtlogin.trans_emp: 2066
-                        .WriteUshort(Keystore.Session.Sequence) // unique wtLoginSequence for wtlogin packets only, should be stored in KeyStore
-                        .WriteUint(Keystore.Uin) // uin, 0 for wtlogin.trans_emp
-                        .WriteByte(3) // extVer
-                        .WriteByte(CmdVer) // cmdVer: [wtlogin.trans_emp, wtlogin.login]: 135, wtlogin.exchange_emp: 69
-                        .WriteUint(0) // actually unknown const 0
-                        .WriteByte(PubId) // pubId (android: 2, windows 17, other 19?)
-                        .WriteUshort(0) // insId
-                        .WriteUshort(AppInfo.AppClientVersion) // cliType(android: 0, windows: 13172)
-                        .WriteUint(0) // retryTime
-                        .WriteBytes(Keystore.Session.WtSessionTicket, Prefix.Uint16 | Prefix.LengthOnly)
-                        .WriteBytes(encrypt, Prefix.None), Prefix.Uint16 | Prefix.WithPrefix, 2);
-                    break;
-                }
-            default: throw new Exception($"Unknown wtlogin cmd: {Command}");
-        }
-
-        packet.WriteByte(3); // 0x03 is the packet end
+            }, Prefix.Uint16 | Prefix.WithPrefix, 2)
+            .WriteByte(3); // 0x03 is the packet end
         return packet;
     }
 
