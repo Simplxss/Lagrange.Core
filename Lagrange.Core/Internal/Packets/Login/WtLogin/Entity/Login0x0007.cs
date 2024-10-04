@@ -22,7 +22,7 @@ internal class Login0x0007 : Login
         .WritePacket(new TlvPacket(0x401, new Tlv401(Device, Keystore)))
         .WritePacket(new TlvPacket(0x198, new Tlv198()))
         .WritePacket(new TlvPacket(0x542, new Tlv542()))
-        .WritePacket(new TlvPacket(0x544, new Tlv544(AppInfo, Device, Keystore.Uin, Cmd, LoginCommand)))
+        .WritePacket(new TlvPacket(0x544, new Tlv544(AppInfo, Device, Keystore, Cmd, LoginCommand)))
         .WritePacket(new TlvPacket(0x553, new Tlv553(AppInfo, Keystore)));
 }
 

@@ -25,11 +25,11 @@ internal class OnebotAndroidSigner : SignProvider
     {
         Url = config["AndroidSignServerUrl"] ?? "";
         SignUrl = $"{Url}/sign";
-        EnergyUrl = $"{Url}/custom_energy";
+        EnergyUrl = $"{Url}/energy";
         GetXwDebugIdUrl = $"{Url}/get_xw_debug_id";
     }
 
-    public override byte[] Sign(BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body)
+    public override byte[] Sign(BotAppInfo appInfo, BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body)
     {
         var signature = new ReserveFields
         {
@@ -63,9 +63,11 @@ internal class OnebotAndroidSigner : SignProvider
                     { "android_id", device.System.AndroidId },
                     { "guid", device.System.Guid.ToByteArray().Hex() },
                     { "qimei36", keystore.Session.QImei?.Q36 ?? "" },
+                    { "qua", appInfo.PackageSign }
                 };
                 var message = _client.PostAsJsonAsync(SignUrl, payload).Result;
                 string response = message.Content.ReadAsStringAsync().Result;
+
                 var json = JsonSerializer.Deserialize<JsonObject>(response);
 
                 var data = json?["data"] ?? json?["value"];
@@ -87,19 +89,22 @@ internal class OnebotAndroidSigner : SignProvider
         return stream.ToArray();
     }
 
-    public override byte[] Energy(string salt, string data)
+    public override byte[] Energy(BotAppInfo appInfo, BotDeviceInfo device, BotKeystore keystore, string data)
     {
         try
         {
-            var payload = new Dictionary<string, string>
+            var payload = new JsonObject
             {
-                { "salt", salt },
-                { "data", data }
+                { "uin", keystore.Uin },
+                { "data", data },
+                { "version", appInfo.WtLoginSdk.SdkVersion },
+                { "guid", device.System.Guid.ToByteArray().Hex() }
             };
-            string response = Http.GetAsync(EnergyUrl, payload).GetAwaiter().GetResult();
+            var message = _client.PostAsJsonAsync(EnergyUrl, payload).Result;
+            string response = message.Content.ReadAsStringAsync().Result;
             var json = JsonSerializer.Deserialize<JsonObject>(response);
 
-            return json?["data"]?["data"]?.ToString().UnHex() ?? Array.Empty<byte>();
+            return json?["data"]?.ToString().UnHex() ?? Array.Empty<byte>();
         }
         catch (Exception)
         {

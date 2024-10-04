@@ -43,9 +43,9 @@ public abstract class SignProvider
         "OidbSvcTrpcTcp.0xf67_5"
     };
 
-    public abstract byte[] Sign(BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body);
+    public abstract byte[] Sign(BotAppInfo appInfo, BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body);
 
-    public virtual byte[] Energy(string salt, string data) => throw new NotImplementedException();
+    public virtual byte[] Energy(BotAppInfo appInfo, BotDeviceInfo device, BotKeystore keystore, string data) => throw new NotImplementedException();
 
     public virtual byte[] GetXwDebugId(uint uin, string cmd, string subCmd) => throw new NotImplementedException();
 }

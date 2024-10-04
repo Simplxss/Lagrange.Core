@@ -26,7 +26,7 @@ internal class StatusRegisterService : BaseService<StatusUnRegisterEvent>
                 Brand = device.System.OsType,
                 VendorOsName = appInfo.VendorOs,
             },
-            U3 = 1
+            U3 = 0
         };
 
         output = packet.Serialize();

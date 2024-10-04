@@ -38,7 +38,7 @@ internal class ExchangeEmp0x000F : ExchangeEmp
         .WritePacket(new TlvPacket(0x516, new Tlv516()))
         .WritePacket(new TlvPacket(0x521, new Tlv521(AppInfo)))
         .WritePacket(new TlvPacket(0x525, new Tlv525()))
-        .WritePacket(new TlvPacket(0x544, new Tlv544(AppInfo, Device, Keystore.Uin, Cmd, ExchangeCommand)))
+        .WritePacket(new TlvPacket(0x544, new Tlv544(AppInfo, Device, Keystore, Cmd, ExchangeCommand)))
         .WritePacket(new TlvPacket(0x553, new Tlv553(AppInfo, Keystore)))
         .WritePacket(new TlvPacket(0x545, new Tlv545(Keystore, AppInfo, Device)));
 }

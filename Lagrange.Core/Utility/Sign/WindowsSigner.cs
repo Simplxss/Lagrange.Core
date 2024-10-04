@@ -17,7 +17,7 @@ internal class WindowsSigner : SignProvider
 
     private readonly HttpClient _client = new();
 
-    public override byte[] Sign(BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body)
+    public override byte[] Sign(BotAppInfo appInfo, BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body)
     {
         var signature = new ReserveFields
         {

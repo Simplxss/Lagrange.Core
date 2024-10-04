@@ -14,7 +14,7 @@ internal static class SsoPacker
     /// </summary>
     public static byte[] Build(SsoPacket packet, BotAppInfo appInfo, BotDeviceInfo device, BotKeystore keystore, SignProvider signProvider)
     {
-        var signature = signProvider.Sign(device, keystore, packet.Command, packet.Sequence, packet.Payload.ToArray());
+        var signature = signProvider.Sign(appInfo, device, keystore, packet.Command, packet.Sequence, packet.Payload.ToArray());
 
         var writer = packet.PacketType switch
         {
