@@ -109,7 +109,7 @@ internal class WtExchangeLogic : LogicBase
             Collection.Log.LogInfo(Tag, "Session has not expired, using session to login and register status");
             try
             {
-                // await ReLogin();
+                await ReLogin();
                 return await BotOnline();
             }
             catch
@@ -166,6 +166,7 @@ internal class WtExchangeLogic : LogicBase
                             Collection.Log.LogInfo(Tag, "Captcha Url is null, please try again later");
                             return false;
                         }
+                    case LoginCommon.State.DeviceLock:
                     case LoginCommon.State.DeviceLock2:
                         {
                             Collection.Log.LogInfo(Tag, "Login Success, but sms code is required, are you sure send sms?");
@@ -581,26 +582,26 @@ internal class WtExchangeLogic : LogicBase
 
         if (Collection.AppInfo.Os == "Android")
         {
-            Collection.Log.LogInfo(Tag, "Trying to do Exchange(RefreshD2)...");
+            // Collection.Log.LogInfo(Tag, "Trying to do Exchange(RefreshD2)...");
 
-            var exchangeEmpEvent = ExchangeEmpEvent.Create(ExchangeEmpEvent.State.RefreshD2);
-            var exchangeEmpResult = await Collection.Business.SendEvent(exchangeEmpEvent);
+            // var exchangeEmpEvent = ExchangeEmpEvent.Create(ExchangeEmpEvent.State.RefreshD2);
+            // var exchangeEmpResult = await Collection.Business.SendEvent(exchangeEmpEvent);
 
-            if (exchangeEmpResult.Count != 0)
-            {
-                var @event = (ExchangeEmpEvent)exchangeEmpResult[0];
-                if ((ExchangeEmp.State)@event.ResultCode == ExchangeEmp.State.Success)
-                {
-                    Collection.Log.LogInfo(Tag, "Exchange Success");
-                }
-                else
-                {
-                    Collection.Log.LogWarning(Tag, @event is { Message: not null, Tag: not null }
-                        ? $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode}) | {@event.Tag}: {@event.Message}"
-                        : $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode})");
-                    return false;
-                }
-            }
+            // if (exchangeEmpResult.Count != 0)
+            // {
+            //     var @event = (ExchangeEmpEvent)exchangeEmpResult[0];
+            //     if ((ExchangeEmp.State)@event.ResultCode == ExchangeEmp.State.Success)
+            //     {
+            //         Collection.Log.LogInfo(Tag, "Exchange Success");
+            //     }
+            //     else
+            //     {
+            //         Collection.Log.LogWarning(Tag, @event is { Message: not null, Tag: not null }
+            //             ? $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode}) | {@event.Tag}: {@event.Message}"
+            //             : $"Exchange Failed: {(ExchangeEmp.State)@event.ResultCode} ({@event.ResultCode})");
+            //         return false;
+            //     }
+            // }
         }
         else
         {

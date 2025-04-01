@@ -13,7 +13,7 @@ namespace Lagrange.Core.Utility.Sign;
 
 internal class AndroidSigner : SignProvider
 {
-    private const string Url = "https://kritor.support/android/v9.0.20";
+    private const string Url = "https://simplxs.cc/qsign";
     private const string SignUrl = $"{Url}/sign";
     private const string EnergyUrl = $"{Url}/energy";
     private const string GetXwDebugIdUrl = $"{Url}/get_xw_debug_id";

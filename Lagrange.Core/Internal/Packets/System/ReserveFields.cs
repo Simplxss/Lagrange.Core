@@ -8,7 +8,7 @@ namespace Lagrange.Core.Internal.Packets.System;
 [ProtoContract]
 internal class ReserveFields
 {
-    [ProtoMember(4)] public byte[]? ClientIpcookie { get; set; }
+    [ProtoMember(8)] public byte[]? ClientIpcookie { get; set; }
 
     [ProtoMember(9)] public uint? Flag { get; set; }
 

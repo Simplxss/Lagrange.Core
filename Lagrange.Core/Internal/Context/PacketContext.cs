@@ -76,6 +76,8 @@ internal class PacketContext : ContextBase
         var task = new TaskCompletionSource<SsoPacket>();
         _pendingTasks.TryAdd(packet.Sequence, task);
 
+        Console.WriteLine($"Sending packet cmd: {packet.Command}");
+
         bool _ = Collection.Socket.Send(BuildPacket(packet)).GetAwaiter().GetResult();
 
         return task.Task;
@@ -86,6 +88,8 @@ internal class PacketContext : ContextBase
     /// </summary>
     public async Task<bool> PostPacket(SsoPacket packet)
     {
+        Console.WriteLine($"Sending packet cmd: {packet.Command}");
+
         return await Collection.Socket.Send(BuildPacket(packet));
     }
 
@@ -93,6 +97,9 @@ internal class PacketContext : ContextBase
     {
         var sso = ParsePacket(packet);
         Keystore.Session.MsgCookie = sso.MsgCookie;
+
+
+        Console.WriteLine($"Receiving packet cmd: {sso.Command}");
 
         if (sso.Sequence > 0 && _pendingTasks.TryRemove(sso.Sequence, out var task))
         {

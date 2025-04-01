@@ -70,6 +70,11 @@ public sealed class LagrangeAppBuilder
         else
         {
             keystore = JsonSerializer.Deserialize<BotKeystore>(File.ReadAllText(keystorePath)) ?? new BotKeystore();
+
+            if (keystore.PasswordMd5 == null || keystore.PasswordWithSalt == null)
+                if (Configuration["Account:Uin"] is { } uin && Configuration["Account:Password"] is { } password)
+                    keystore.InitPassword(uint.Parse(uin), password);
+                else throw new Exception("no password");
         }
 
         BotDeviceInfo deviceInfo;
@@ -116,7 +121,7 @@ public sealed class LagrangeAppBuilder
         Services.AddSingleton<LiteDatabase>(x =>
         {
             string path = Configuration["ConfigPath:Database"] ?? $"lagrange-{Configuration["Account:Uin"]}.db";
-            
+
             var db = new LiteDatabase(path);
             db.CheckpointSize = 50;
             return db;

@@ -2,6 +2,7 @@ using System.Text.Json;
 using Lagrange.Core;
 using Lagrange.Core.Common.Interface.Api;
 using Lagrange.Core.Event.EventArg;
+using Lagrange.Core.Internal.Event.System;
 using Lagrange.OneBot.Core.Network;
 using Lagrange.OneBot.Core.Notify;
 using Lagrange.OneBot.Core.Operation;
@@ -74,6 +75,8 @@ public class LagrangeApp : IHost
             Services.GetRequiredService<NotifyService>().RegisterEvents();
             
             await File.WriteAllTextAsync(Configuration["ConfigPath:Keystore"] ?? "keystore.json", json, cancellationToken);
+
+            var events = await Instance.ContextCollection.Business.SendEvent(FetchRKeyEvent.Create());
         };
         
         if (string.IsNullOrEmpty(Configuration["Account:Password"]) &&

@@ -30,6 +30,11 @@ public class BotKeystore
     /// <param name="password">Password Raw</param>
     internal BotKeystore(uint uin, string password) : this()
     {
+        InitPassword(uin, password);
+    }
+
+    internal void InitPassword(uint uin, string password)
+    {
         Uin = uin;
         PasswordMd5 = Encoding.UTF8.GetBytes(password).Md5().UnHex();
 
@@ -39,7 +44,6 @@ public class BotKeystore
             .ToArray();
         PasswordWithSalt = tmp.Md5().UnHex();
     }
-
     public uint Uin { get; set; }
 
     public string? Uid { get; set; }

@@ -197,7 +197,6 @@ internal class WtLoginService : BaseService<WtLoginEvent>
             output = WtLoginEvent.Result((int)state, tlv146.Tag, tlv146.Message);
             extraEvents = null;
             return true;
-
         }
         else
         {

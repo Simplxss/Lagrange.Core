@@ -63,6 +63,7 @@ internal class OnebotAndroidSigner : SignProvider
                     { "android_id", device.System.AndroidId },
                     { "guid", device.System.Guid.ToByteArray().Hex() },
                     { "qimei36", keystore.Session.QImei?.Q36 ?? "" },
+                    { "oaid", "0123456789abcef" },
                     { "qua", appInfo.PackageSign }
                 };
                 var message = _client.PostAsJsonAsync(SignUrl, payload).Result;
@@ -98,7 +99,10 @@ internal class OnebotAndroidSigner : SignProvider
                 { "uin", keystore.Uin },
                 { "data", data },
                 { "version", appInfo.WtLoginSdk.SdkVersion },
-                { "guid", device.System.Guid.ToByteArray().Hex() }
+                { "android_id", device.System.AndroidId },
+                { "guid", device.System.Guid.ToByteArray().Hex() },
+                { "qimei36", keystore.Session.QImei?.Q36 ?? "" },
+                { "oaid", "0123456789abcef" },
             };
             var message = _client.PostAsJsonAsync(EnergyUrl, payload).Result;
             string response = message.Content.ReadAsStringAsync().Result;
