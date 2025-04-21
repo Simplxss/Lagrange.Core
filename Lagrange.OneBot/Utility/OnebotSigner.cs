@@ -21,7 +21,7 @@ internal class OnebotSigner : SignProvider
     public OnebotSigner(IConfiguration config)
     {
         Url = config["SignServerUrl"] ?? "";
-        SignUrl = $"{Url}/sign";
+        SignUrl = $"{Url}";
     }
 
     public override byte[] Sign(BotAppInfo appInfo, BotDeviceInfo device, BotKeystore keystore, string cmd, int seq, byte[] body)

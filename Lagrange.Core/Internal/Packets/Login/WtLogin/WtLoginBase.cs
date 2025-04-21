@@ -15,7 +15,8 @@ internal abstract class WtLoginBase
     protected readonly BotAppInfo AppInfo;
     protected readonly BotDeviceInfo Device;
 
-    protected readonly EcdhImpl EcdhImpl = new EcdhImpl(EcdhImpl.CryptMethod.Prime256V1);
+    protected readonly static EcdhImpl.CryptMethod CryptMethod = EcdhImpl.CryptMethod.Prime256V1;
+    protected readonly EcdhImpl EcdhImpl = new(CryptMethod);
 
     protected WtLoginBase(string command, ushort cmd, byte cmdVar, byte pubId, BotKeystore keystore, BotAppInfo appInfo, BotDeviceInfo device)
     {
@@ -34,7 +35,8 @@ internal abstract class WtLoginBase
 
         var packet = new BinaryPacket()
             .WriteByte(2) // packet start
-            .Barrier(w => {
+            .Barrier(w =>
+            {
                 w.WriteUshort(0x1F41) // ver
                     .WriteUshort(Cmd) // cmd: [wtlogin.login, wtlogin.exchange_emp]: 2064, wtlogin.trans_emp: 2066
                     .WriteUshort(Keystore.Session.Sequence) // unique wtLoginSequence for wtlogin packets only, should be stored in KeyStore
@@ -54,13 +56,26 @@ internal abstract class WtLoginBase
                             Keystore.Stub.RandomKey = ByteGen.GenRandomBytes(16);
                             var encrypt = Keystore.TeaImpl.Encrypt(body.ToArray(), EcdhImpl.ShareKey);
 
-                            w.WriteByte(2) // curve type: Secp192K1: 1 (used by pcnt), Prime256V1: 2 (used by android)
-                                .WriteByte(1) // rollback flag
-                                .WriteBytes(Keystore.Stub.RandomKey, Prefix.None) // randKey
-                                .WriteUshort(0x0131) // android: 0x0131, windows: 0x0102
-                                .WriteUshort(0x0001) // public_key_ver (only for Prime256V1)(client: 0x0001, http: 0x0002)
-                                .WriteBytes(EcdhImpl.GetPublicKey(false), Prefix.Uint16 | Prefix.LengthOnly) // pubKey
-                                .WriteBytes(encrypt, Prefix.None);
+                            switch (CryptMethod)
+                            {
+                                case EcdhImpl.CryptMethod.Secp192K1:
+                                    w.WriteByte(1) // curve type: Secp192K1: 1 (used by pcnt), Prime256V1: 2 (used by android)
+                                        .WriteByte(1) // rollback flag
+                                        .WriteBytes(Keystore.Stub.RandomKey, Prefix.None) // randKey
+                                        .WriteUshort(0x0131) // android: 0x0131, windows: 0x0102
+                                        .WriteBytes(EcdhImpl.GetPublicKey(true), Prefix.Uint16 | Prefix.LengthOnly) // pubKey
+                                        .WriteBytes(encrypt, Prefix.None);
+                                    break;
+                                case EcdhImpl.CryptMethod.Prime256V1:
+                                    w.WriteByte(2) // curve type: Secp192K1: 1 (used by pcnt), Prime256V1: 2 (used by android)
+                                        .WriteByte(1) // rollback flag
+                                        .WriteBytes(Keystore.Stub.RandomKey, Prefix.None) // randKey
+                                        .WriteUshort(0x0131) // android: 0x0131, windows: 0x0102
+                                        .WriteUshort(0x0001) // public_key_ver (only for Prime256V1)(client: 0x0001, http: 0x0002)
+                                        .WriteBytes(EcdhImpl.GetPublicKey(false), Prefix.Uint16 | Prefix.LengthOnly) // pubKey
+                                        .WriteBytes(encrypt, Prefix.None);
+                                    break;
+                            }
                             break;
                         }
                     case 0x45:

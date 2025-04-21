@@ -62,7 +62,7 @@ Please use Lagrange.Core responsibly and in accordance with the law.
 
 ## SignServer
 
-https://sign.lagrangecore.org/api/sign
+https://sign.lagrangecore.org/api/sign/30366/sign
 
 Thanks for 外国热心网友 for Provision of Azure Servlet
 
@@ -298,7 +298,7 @@ Thanks for 外国热心网友 for Provision of Azure Servlet
       "Microsoft.Hosting.Lifetime": "Information"
     }
   },
-  "SignServerUrl": "https://sign.lagrangecore.org/api/sign",
+  "SignServerUrl": "https://sign.lagrangecore.org/api/sign/30366/sign",
   "Account": {
     "Uin": 0,
     "Password": "",

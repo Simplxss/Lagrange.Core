@@ -12,7 +12,7 @@ namespace Lagrange.Core.Utility.Sign;
 
 internal class LinuxSigner : SignProvider
 {
-    private const string Url = "https://sign.lagrangecore.org/api";
+    private const string Url = "https://sign.lagrangecore.org/api/sign/30366";
     private const string SignUrl = $"{Url}/sign";
 
     private readonly HttpClient _client = new();
